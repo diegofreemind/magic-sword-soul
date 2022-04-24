@@ -6,6 +6,8 @@ export abstract class Character {
     protected intelligence: Number
   ) {}
 
+  abstract attack(): Number;
+
   get getLife() {
     return this.life;
   }

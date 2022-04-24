@@ -16,4 +16,12 @@ export default class Mage extends Character {
       MAGE_INTELLIGENCE_DEFAULT
     );
   }
+
+  attack(): Number {
+    return (
+      MAGE_SKILL_DEFAULT * 0.5 +
+      MAGE_STRENGTH_DEFAULT * 0.2 +
+      MAGE_INTELLIGENCE_DEFAULT * 1.5
+    );
+  }
 }

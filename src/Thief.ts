@@ -16,4 +16,14 @@ export default class Thief extends Character {
       THIEF_INTELLIGENCE_DEFAULT
     );
   }
+
+  // TODO: think about magic numbers *( code smells )
+
+  attack(): Number {
+    return (
+      THIEF_SKILL_DEFAULT +
+      THIEF_STRENGTH_DEFAULT * 0.25 +
+      THIEF_INTELLIGENCE_DEFAULT * 0.25
+    );
+  }
 }
