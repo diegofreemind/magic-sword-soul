@@ -1,6 +1,6 @@
-import Warrior from '../src/Warrior';
-import Thief from '../src/Thief';
-import Mage from '../src/Mage';
+import Warrior from '../src/entities/Warrior';
+import Thief from '../src/entities/Thief';
+import Mage from '../src/entities/Mage';
 
 test('Deve instanciar um objeto da classe Warrior', () => {
   // TODO: create a factory for characters
