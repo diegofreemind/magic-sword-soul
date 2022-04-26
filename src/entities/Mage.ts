@@ -1,7 +1,5 @@
 import { Character } from './Character';
 
-// TODO: import class-validator
-
 export const MAGE_LIFE_DEFAULT = 12;
 export const MAGE_SKILL_DEFAULT = 6;
 export const MAGE_STRENGTH_DEFAULT = 5;

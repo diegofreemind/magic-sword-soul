@@ -1,7 +1,5 @@
 import { Character } from './Character';
 
-// TODO: import class-validator
-
 export const THIEF_LIFE_DEFAULT = 15;
 export const THIEF_SKILL_DEFAULT = 10;
 export const THIEF_STRENGTH_DEFAULT = 4;

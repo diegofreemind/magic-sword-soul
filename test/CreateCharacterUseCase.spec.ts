@@ -1,22 +1,22 @@
 import CreateCharacterUseCase from '../src/useCases/CreateCharacterUseCase';
-import { CharacterProps } from '../src/useCases/CreateCharacterUseCase';
+import { CharacterDTO } from '../src/useCases/CharacterDTO';
 import Warrior from '../src/entities/Warrior';
 import Thief from '../src/entities/Thief';
 import Mage from '../src/entities/Mage';
 
 describe('F1 - Deve criar um novo personagem', () => {
   test('Cria um novo personagem ao receber os parâmetros esperados', () => {
-    const warriorProps: CharacterProps = {
+    const warriorProps: CharacterDTO = {
       name: 'Gusnmg Hujn',
       profession: 'warrior',
     };
 
-    const thiefProps: CharacterProps = {
+    const thiefProps: CharacterDTO = {
       name: 'Fytr Hujn',
       profession: 'thief',
     };
 
-    const mageProps: CharacterProps = {
+    const mageProps: CharacterDTO = {
       name: 'Dangalf Hujn',
       profession: 'mage',
     };
@@ -36,6 +36,13 @@ describe('F1 - Deve criar um novo personagem', () => {
 
   it('Deve retornar um erro ao receber os parâmetros incorretos', () => {
     const sut = new CreateCharacterUseCase();
-    expect(() => sut.execute({} as CharacterProps)).toThrow();
+    expect(() => sut.execute({} as CharacterDTO)).toThrow();
+  });
+
+  it('Deve retornar um erro ao receber uma profissão desconhecida', () => {
+    const sut = new CreateCharacterUseCase();
+    expect(() =>
+      sut.execute({ name: 'Dangalf', profession: 'witcher' } as any)
+    ).toThrow();
   });
 });

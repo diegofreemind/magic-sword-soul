@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "test": "jest",
-    "build":"tsc"
+    "build": "tsc"
   },
   "jest": {
     "moduleFileExtensions": [
@@ -36,5 +36,9 @@
     "prettier": "^2.6.2",
     "ts-jest": "^27.1.4",
     "typescript": "^4.6.3"
+  },
+  "dependencies": {
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.13.2"
   }
 }

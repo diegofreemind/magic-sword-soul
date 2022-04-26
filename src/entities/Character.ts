@@ -1,3 +1,5 @@
+// TODO: add generic props Character<T>?
+
 export abstract class Character {
   constructor(
     protected life: Number,

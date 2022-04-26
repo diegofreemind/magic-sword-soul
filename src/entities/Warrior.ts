@@ -1,7 +1,5 @@
 import { Character } from './Character';
 
-// TODO: import class-validator
-
 export const WARRIOR_LIFE_DEFAULT = 20;
 export const WARRIOR_SKILL_DEFAULT = 5;
 export const WARRIOR_STRENGTH_DEFAULT = 10;
