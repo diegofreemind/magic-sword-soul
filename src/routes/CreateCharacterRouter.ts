@@ -1,10 +1,12 @@
 import { createCharacterController } from '../useCases';
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 
 const createCharacterRouter = Router();
 
-createCharacterRouter.post('/character', (req: Request, res: Response) =>
-  createCharacterController.handle(req, res)
+createCharacterRouter.post(
+  '/character',
+  (req: Request, res: Response, next: NextFunction) =>
+    createCharacterController.handle(req, res, next)
 );
 
 export { createCharacterRouter };

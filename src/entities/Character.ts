@@ -1,4 +1,6 @@
 // TODO: add generic props Character<T>?
+// TODO: generate uuid for Character
+// TODO: handle Character props Omit<Character, 'id'>
 
 export abstract class Character {
   constructor(

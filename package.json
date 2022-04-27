@@ -16,6 +16,7 @@
       "json",
       "ts"
     ],
+    "verbose":true,
     "testRegex": ".*\\.spec\\.ts$",
     "rootDir": ".",
     "transform": {

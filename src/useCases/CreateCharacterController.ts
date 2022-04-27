@@ -1,22 +1,26 @@
-import { Request, Response } from 'express';
 import { CharacterDTO } from './CharacterDTO';
+import { NextFunction, Request, Response } from 'express';
+
 import { validatorDto } from '../shared/validators/validatorDTO';
+import { HTTP_CREATED_CODE } from '../shared/constants/httpStatusCode';
 import CreateCharacterUseCase from '../useCases/CreateCharacterUseCase';
 
 // TODO: validate attributes ( Value Object responsability )
 export default class CreateCharacterController {
   constructor(private createCharacterUseCase: CreateCharacterUseCase) {}
-  async handle(request: Request, response: Response): Promise<Response> {
+  async handle(
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
     try {
       const props = request.body;
       await validatorDto(CharacterDTO, props);
       const newCharacter = this.createCharacterUseCase.execute(props);
 
-      return response.status(201).json(newCharacter);
+      return response.status(HTTP_CREATED_CODE).send(newCharacter);
     } catch (error: any) {
-      return response.status(400).json({
-        error: error?.message || 'Unexpected error',
-      });
+      next(error);
     }
   }
 }

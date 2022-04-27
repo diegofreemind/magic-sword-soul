@@ -4,7 +4,7 @@ import CreateCharacterUseCase from '../../src/useCases/CreateCharacterUseCase';
 const createCharacterUseCase = new CreateCharacterUseCase();
 const sut = new CreateCharacterController(createCharacterUseCase);
 
-test('Add unit tests for controller', () => {});
+test.skip('Add unit tests for controller', () => {});
 // const spy = jest.spyOn(sut, 'handle');
 
 // afterEach(() => {
