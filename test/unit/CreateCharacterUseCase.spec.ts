@@ -1,10 +1,12 @@
-import CreateCharacterUseCase from '../src/useCases/CreateCharacterUseCase';
-import { CharacterDTO } from '../src/useCases/CharacterDTO';
-import Warrior from '../src/entities/Warrior';
-import Thief from '../src/entities/Thief';
-import Mage from '../src/entities/Mage';
+import CreateCharacterUseCase from '../../src/useCases/CreateCharacterUseCase';
+import { CharacterDTO } from '../../src/useCases/CharacterDTO';
+import Warrior from '../../src/entities/Warrior';
+import Thief from '../../src/entities/Thief';
+import Mage from '../../src/entities/Mage';
 
-describe('F1 - Deve criar um novo personagem', () => {
+// TODO: inject fake repository
+
+describe('Validações sobre o caso de uso CreateCharacter', () => {
   test('Cria um novo personagem ao receber os parâmetros esperados', () => {
     const warriorProps: CharacterDTO = {
       name: 'Gusnmg Hujn',

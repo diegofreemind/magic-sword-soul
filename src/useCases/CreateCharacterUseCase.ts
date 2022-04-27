@@ -7,6 +7,7 @@ export default class CreateCharacterUseCase {
 
   execute(props: CharacterDTO): Character {
     // TODO: validate already created character
+    // TODO: persist new Character
     return CharacterFactory.create(props.profession, props.name);
   }
 }
