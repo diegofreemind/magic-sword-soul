@@ -19,7 +19,11 @@ export default class Mage extends Character {
     );
   }
 
-  attack(): Number {
+  speed(): number {
+    return MAGE_STRENGTH_DEFAULT * 0.2 + MAGE_SKILL_DEFAULT * 0.5;
+  }
+
+  attack(): number {
     return (
       MAGE_SKILL_DEFAULT * 0.5 +
       MAGE_STRENGTH_DEFAULT * 0.2 +

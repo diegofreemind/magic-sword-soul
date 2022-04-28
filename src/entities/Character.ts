@@ -1,6 +1,4 @@
 // TODO: add generic props Character<T>?
-// TODO: generate uuid for Character
-// TODO: handle Character props Omit<Character, 'id'>
 
 import { Professions } from '../useCases/CharacterDTO';
 import { v4 } from 'uuid';
@@ -9,10 +7,10 @@ export abstract class Character {
   constructor(
     protected name: string,
     protected profession: Professions,
-    protected life: Number,
-    protected skill: Number,
-    protected strength: Number,
-    protected intelligence: Number,
+    protected life: number,
+    protected skill: number,
+    protected strength: number,
+    protected intelligence: number,
     protected id?: string
   ) {
     if (!id) {
@@ -20,7 +18,8 @@ export abstract class Character {
     }
   }
 
-  abstract attack(): Number;
+  abstract attack(): number;
+  abstract speed(): number;
 
   get getId() {
     return this.id;

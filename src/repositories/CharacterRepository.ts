@@ -9,19 +9,16 @@ export default class CharacterRepository implements ICharacterRepository {
     return Promise.resolve();
   }
 
-  find(query: any): Promise<Character[]> | undefined {
-    if (query?.name && query?.profession) {
-      return Promise.resolve(
-        this.charactersInMemory.filter((current) => {
-          if (
-            current.getName == query.name &&
-            current.getProfession == query.profession
-          ) {
-            return current;
-          }
-        })
-      );
-    }
+  find(query: { name: string; profession: string }): Promise<Character[]> {
+    const result = this.charactersInMemory.filter((current) => {
+      if (
+        current.getName == query.name &&
+        current.getProfession == query.profession
+      ) {
+        return current;
+      }
+    });
+    return Promise.resolve(result);
   }
 
   findById(id: string): Promise<Character | undefined> {

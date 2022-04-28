@@ -2,9 +2,9 @@ next commit
 
 # start designing api
 
-- include generic props for super class ( )
-- implement CharacterRepository -> save ( )
-- add tests for Character att contraints ( )
+- validate name property constraints ( x )
+- implement CharacterRepository -> save ( x )
+- add tests for Character att contraints ( x )
 
 last commit
 

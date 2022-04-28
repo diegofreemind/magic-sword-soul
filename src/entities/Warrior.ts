@@ -21,7 +21,11 @@ export default class Warrior extends Character {
 
   // TODO: think about magic numbers *( code smells )
 
-  attack(): Number {
+  speed(): number {
+    return WARRIOR_SKILL_DEFAULT * 0.6 + WARRIOR_INTELLIGENCE_DEFAULT * 0.2;
+  }
+
+  attack(): number {
     return WARRIOR_STRENGTH_DEFAULT * 0.8 + WARRIOR_SKILL_DEFAULT * 0.2;
   }
 }

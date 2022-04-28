@@ -21,6 +21,11 @@ describe('Validações sobre as entidades de personagens', () => {
     expect(warrior.attack()).toBe(9);
   });
 
+  test('Warrior Speed: 60% da Destreza + 20% da Inteligência', () => {
+    const warrior = new Warrior('Gusmng Thyeks');
+    expect(warrior.speed()).toBe(4);
+  });
+
   test('Deve instanciar um objeto da classe Thief', () => {
     // TODO: create a factory for characters
     const thief = new Thief('Fkmaas Ghetryn');
@@ -39,6 +44,11 @@ describe('Validações sobre as entidades de personagens', () => {
     expect(thief.attack()).toBe(12);
   });
 
+  test('Thief Speed: 80% da Destreza', () => {
+    const thief = new Thief('Fkmaas Ghetryn');
+    expect(thief.speed()).toBe(8);
+  });
+
   test('Deve instanciar um objeto da classe Mage', () => {
     // TODO: create a factory for characters
     const mage = new Mage('Dangalf Musy');
@@ -55,5 +65,10 @@ describe('Validações sobre as entidades de personagens', () => {
   test('Mage Attack: 20% da Força + 50% da Destreza + 150% da Inteligência', () => {
     const mage = new Mage('Dangalf Musy');
     expect(mage.attack()).toBe(19);
+  });
+
+  test('Mage Speed: 20% da Força + 50% da Destreza', () => {
+    const mage = new Mage('Dangalf Musy');
+    expect(mage.speed()).toBe(4);
   });
 });

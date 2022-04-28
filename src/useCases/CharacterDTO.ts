@@ -1,4 +1,4 @@
-import { IsIn, IsNotEmpty, Matches, MaxLength } from 'class-validator';
+import { IsIn, IsNotEmpty, Matches, MaxLength, IsAlpha } from 'class-validator';
 
 export enum Professions {
   Warrior = 'warrior',
@@ -12,6 +12,6 @@ export class CharacterDTO {
 
   @IsNotEmpty()
   @MaxLength(15)
-  @Matches('[a-zA-Z_]')
+  @Matches(/^[a-zA-Z_]+$/)
   readonly name!: string;
 }

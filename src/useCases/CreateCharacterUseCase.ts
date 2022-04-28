@@ -18,7 +18,7 @@ export default class CreateCharacterUseCase {
       profession,
     });
 
-    if (isAlreadyCreated && isAlreadyCreated?.length > 0) {
+    if (isAlreadyCreated?.length > 0) {
       throw new ConflictException(
         `Identifier ${name} for ${profession} is not available`
       );

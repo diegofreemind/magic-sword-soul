@@ -19,7 +19,7 @@ beforeEach(() => {
 describe('Validações sobre o caso de uso CreateCharacter', () => {
   test('Cria um novo personagem Warrior ao receber os parâmetros esperados', async () => {
     const warriorProps: CharacterDTO = {
-      name: 'Gusnmg Hujn',
+      name: 'Gusnmg_Hujn',
       profession: 'warrior',
     };
 
@@ -35,7 +35,7 @@ describe('Validações sobre o caso de uso CreateCharacter', () => {
 
   test('Cria um novo personagem Thief ao receber os parâmetros esperados', async () => {
     const thiefProps: CharacterDTO = {
-      name: 'Fytr Hujn',
+      name: 'Fytr_Hujn',
       profession: 'thief',
     };
 
@@ -51,7 +51,7 @@ describe('Validações sobre o caso de uso CreateCharacter', () => {
 
   test('Cria um novo personagem Mage ao receber os parâmetros esperados', async () => {
     const mageProps: CharacterDTO = {
-      name: 'Dangalf Hujn',
+      name: 'Dangalf_Hujn',
       profession: 'mage',
     };
 
@@ -72,7 +72,7 @@ describe('Validações sobre o caso de uso CreateCharacter', () => {
 
   test('Deve retornar um erro ao receber uma profissão desconhecida', async () => {
     await expect(() =>
-      sut.execute({ name: 'Dangalf', profession: 'witcher' } as any)
+      sut.execute({ name: 'Gerald', profession: 'witcher' } as any)
     ).rejects.toThrow();
 
     // TODO: align with DTO validation on controller
@@ -81,7 +81,7 @@ describe('Validações sobre o caso de uso CreateCharacter', () => {
 
   test('Deve retornar um erro ao tentar criar um personagem já existente', async () => {
     const warriorProps: CharacterDTO = {
-      name: 'Gusnmg Hujn',
+      name: 'Gusnmg_Hujn',
       profession: 'warrior',
     };
 

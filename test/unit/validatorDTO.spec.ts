@@ -1,21 +1,104 @@
+import { BadRequestException } from '../../src/shared/exceptions/BadRequestException';
 import { validatorDto } from '../../src/shared/validators/validatorDTO';
 import { CharacterDTO } from '../../src/useCases/CharacterDTO';
 
-test('Deve validar o payload sobre propriedades mapeadas na classe CharacterDTO', async () => {
-  const props = {
-    name: 'Dangalf Mugh',
-    profession: 'mage',
-  };
+describe('Character: Um nome só pode ter letras ou o carácter de "_" (underscore/sublinhado)', () => {
+  test('Deve validar nome com o formato esperado', async () => {
+    const props = {
+      name: 'Dangalf_Mugh',
+      profession: 'mage',
+    };
 
-  expect(() => validatorDto(CharacterDTO, props)).not.toThrow();
-  expect.assertions(1);
+    // TODO: set custom error ( spaces | underscore )
+    await expect(validatorDto(CharacterDTO, props)).resolves.not.toThrow();
+  });
+
+  test('Deve retornar um erro ao receber um número junto ao nome', async () => {
+    const props = {
+      name: 'Dangalf8Mugh',
+      profession: 'mage',
+    };
+
+    try {
+      await validatorDto(CharacterDTO, props);
+    } catch (error) {
+      expect(error).toBeInstanceOf(BadRequestException);
+      expect(error).toHaveProperty('message');
+      expect(error).toMatchObject(
+        expect.objectContaining({
+          status: 400,
+          message: 'name must match /^[a-zA-Z_]+$/ regular expression',
+        })
+      );
+      expect.assertions(3);
+    }
+  });
+
+  test('Deve retornar um erro ao receber uma profissão desconhecida', async () => {
+    const props = {
+      name: 'DangalfMugh',
+      profession: 'witcher',
+    };
+
+    try {
+      await validatorDto(CharacterDTO, props);
+    } catch (error) {
+      expect(error).toBeInstanceOf(BadRequestException);
+      expect(error).toHaveProperty('message');
+      expect(error).toMatchObject(
+        expect.objectContaining({
+          status: 400,
+          message:
+            'profession must be one of the following values: warrior, thief, mage',
+        })
+      );
+      expect.assertions(3);
+    }
+  });
 });
 
-test('Deve retornar um erro sobre propriedades mapeadas na classe CharacterDTO', async () => {
-  const props = {
-    name: 'Dangalf Mugh',
-    profession: 'witcher',
-  };
+describe('Character: Nenhum nome de personagem pode ter mais que 15 caracteres no total', () => {
+  test('Deve retornar um erro ao receber um nome com mais de 15 caracteres', async () => {
+    const props = {
+      name: 'DangalfKhjytFdrtew',
+      profession: 'mage',
+    };
 
-  await expect(validatorDto(CharacterDTO, props)).rejects.toThrow();
+    try {
+      await validatorDto(CharacterDTO, props);
+    } catch (error) {
+      expect(error).toBeInstanceOf(BadRequestException);
+      expect(error).toHaveProperty('message');
+      expect(error).toMatchObject(
+        expect.objectContaining({
+          status: 400,
+          message: 'name must be shorter than or equal to 15 characters',
+        })
+      );
+      expect.assertions(3);
+    }
+  });
+
+  test('Deve retornar um erro ao receber um nome com espaços em branco', async () => {
+    const props = {
+      name: 'Dang hjytF',
+      profession: 'mage',
+    };
+
+    try {
+      await validatorDto(CharacterDTO, props);
+    } catch (error) {
+      expect(error).toBeInstanceOf(BadRequestException);
+      expect(error).toHaveProperty('message');
+
+      // TODO: set custom error ( spaces | underscore )
+      expect(error).toMatchObject(
+        expect.objectContaining({
+          status: 400,
+          message: 'name must match /^[a-zA-Z_]+$/ regular expression',
+        })
+      );
+      expect.assertions(3);
+    }
+  });
 });

@@ -21,7 +21,11 @@ export default class Thief extends Character {
 
   // TODO: think about magic numbers *( code smells )
 
-  attack(): Number {
+  speed(): number {
+    return THIEF_SKILL_DEFAULT * 0.8;
+  }
+
+  attack(): number {
     return (
       THIEF_SKILL_DEFAULT +
       THIEF_STRENGTH_DEFAULT * 0.25 +
