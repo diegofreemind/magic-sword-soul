@@ -1,4 +1,4 @@
-import CharacterRepository from '../repositories/CharacterRepository';
+import CharacterRepository from '../../repositories/CharacterRepository';
 import CreateCharacterController from './CreateCharacterController';
 import CreateCharacterUseCase from './CreateCharacterUseCase';
 

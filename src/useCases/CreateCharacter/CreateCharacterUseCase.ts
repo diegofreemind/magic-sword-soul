@@ -1,10 +1,9 @@
-import { ICharacterRepository } from '../repositories/ICharacterRepository';
-import { ConflictException } from '../shared/exceptions/ConflictException';
-import { validatorDto } from '../shared/validators/validatorDTO';
-
-import CharacterFactory from './CharacterFactory';
-import { Character } from '../entities/Character';
+import { Character } from '../../entities/Character';
+import { ICharacterRepository } from '../../repositories/ICharacterRepository';
+import { ConflictException } from '../../shared/exceptions/ConflictException';
+import { validatorDto } from '../../shared/validators/validatorDTO';
 import { CharacterDTO } from './CharacterDTO';
+import CharacterFactory from './CharacterFactory';
 
 export default class CreateCharacterUseCase {
   constructor(private characterRepository: ICharacterRepository) {}

@@ -1,9 +1,8 @@
-import { CharacterDTO } from './CharacterDTO';
 import { NextFunction, Request, Response } from 'express';
-
-import { validatorDto } from '../shared/validators/validatorDTO';
-import { HTTP_CREATED_CODE } from '../shared/constants/httpStatusCode';
-import CreateCharacterUseCase from '../useCases/CreateCharacterUseCase';
+import { HTTP_CREATED_CODE } from '../../shared/constants/httpStatusCode';
+import { validatorDto } from '../../shared/validators/validatorDTO';
+import { CharacterDTO } from './CharacterDTO';
+import CreateCharacterUseCase from './CreateCharacterUseCase';
 
 // TODO: validate attributes ( Value Object responsability )
 export default class CreateCharacterController {

@@ -1,4 +1,4 @@
-import { IsIn, IsNotEmpty, Matches, MaxLength, IsAlpha } from 'class-validator';
+import { IsIn, IsNotEmpty, Matches, MaxLength } from 'class-validator';
 
 export enum Professions {
   Warrior = 'warrior',

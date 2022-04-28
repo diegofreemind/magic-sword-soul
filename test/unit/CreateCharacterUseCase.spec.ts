@@ -1,10 +1,10 @@
-import { CharacterRepositoryFake } from '../__mocks__/CharacterRepository';
-import CreateCharacterUseCase from '../../src/useCases/CreateCharacterUseCase';
-import CharacterFactory from '../../src/useCases/CharacterFactory';
-import { CharacterDTO } from '../../src/useCases/CharacterDTO';
-import Warrior from '../../src/entities/Warrior';
-import Thief from '../../src/entities/Thief';
 import Mage from '../../src/entities/Mage';
+import Thief from '../../src/entities/Thief';
+import Warrior from '../../src/entities/Warrior';
+import { CharacterDTO } from '../../src/useCases/CreateCharacter/CharacterDTO';
+import CharacterFactory from '../../src/useCases/CreateCharacter/CharacterFactory';
+import CreateCharacterUseCase from '../../src/useCases/CreateCharacter/CreateCharacterUseCase';
+import { CharacterRepositoryFake } from '../__mocks__/CharacterRepository';
 
 const characterRepositoryFake = new CharacterRepositoryFake();
 const sut = new CreateCharacterUseCase(characterRepositoryFake);

@@ -1,6 +1,6 @@
 import { BadRequestException } from '../../src/shared/exceptions/BadRequestException';
 import { validatorDto } from '../../src/shared/validators/validatorDTO';
-import { CharacterDTO } from '../../src/useCases/CharacterDTO';
+import { CharacterDTO } from '../../src/useCases/CreateCharacter/CharacterDTO';
 
 describe('Character: Um nome só pode ter letras ou o carácter de "_" (underscore/sublinhado)', () => {
   test('Deve validar nome com o formato esperado', async () => {

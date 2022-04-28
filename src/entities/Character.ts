@@ -1,7 +1,7 @@
 // TODO: add generic props Character<T>?
 
-import { Professions } from '../useCases/CharacterDTO';
 import { v4 } from 'uuid';
+import { Professions } from '../useCases/CreateCharacter/CharacterDTO';
 
 export abstract class Character {
   constructor(

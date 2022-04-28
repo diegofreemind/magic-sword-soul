@@ -1,5 +1,5 @@
-import { createCharacterController } from '../useCases';
-import { Router, Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response, Router } from 'express';
+import { createCharacterController } from '../useCases/CreateCharacter';
 
 const createCharacterRouter = Router();
 

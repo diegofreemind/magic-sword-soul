@@ -1,4 +1,4 @@
-import { Professions } from '../useCases/CharacterDTO';
+import { Professions } from '../useCases/CreateCharacter/CharacterDTO';
 import { Character } from './Character';
 
 export const WARRIOR_LIFE_DEFAULT = 20;
