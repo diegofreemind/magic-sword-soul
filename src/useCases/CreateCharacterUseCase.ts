@@ -18,12 +18,14 @@ export default class CreateCharacterUseCase {
       profession,
     });
 
-    console.log({ isAlreadyCreated });
-    if (isAlreadyCreated.length > 0) {
-      throw new ConflictException(`Character name ${name} is not available`);
+    if (isAlreadyCreated && isAlreadyCreated?.length > 0) {
+      throw new ConflictException(
+        `Identifier ${name} for ${profession} is not available`
+      );
     }
 
-    // TODO: persist new Character
-    return CharacterFactory.create(profession, name);
+    const newCharacter = CharacterFactory.create(profession, name);
+    await this.characterRepository.save(newCharacter);
+    return newCharacter;
   }
 }

@@ -1,6 +1,6 @@
 import { IsIn, IsNotEmpty, Matches, MaxLength } from 'class-validator';
 
-enum Professions {
+export enum Professions {
   Warrior = 'warrior',
   Thief = 'thief',
   Mage = 'mage',

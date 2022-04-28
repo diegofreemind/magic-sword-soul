@@ -10,12 +10,13 @@ describe.only('POST /character', () => {
     });
 
     expect(result.statusCode).toEqual(201);
-    expect(result.body).toEqual({
+    expect(result.body).toContain({
       life: 20,
       skill: 5,
       strength: 10,
       intelligence: 5,
       name: 'Gusnmg Hujn',
+      profession: 'warrior',
     });
   });
 

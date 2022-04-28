@@ -1,7 +1,7 @@
-import Mage from '../../entities/Mage';
-import Warrior from '../../entities/Warrior';
-import { Character } from '../../entities/Character';
-import { ICharacterRepository } from '../ICharacterRepository';
+import Mage from '../../src/entities/Mage';
+import Warrior from '../../src/entities/Warrior';
+import { Character } from '../../src/entities/Character';
+import { ICharacterRepository } from '../../src/repositories/ICharacterRepository';
 
 export class CharacterRepositoryFake implements ICharacterRepository {
   findByName(name: string): Promise<Character | undefined> {
@@ -15,6 +15,6 @@ export class CharacterRepositoryFake implements ICharacterRepository {
     return jest.mocked(Promise.resolve(new Warrior('Fgje Sdrt')));
   }
   save(character: Character): Promise<void> {
-    throw new Error('Method not implemented.');
+    return Promise.resolve();
   }
 }

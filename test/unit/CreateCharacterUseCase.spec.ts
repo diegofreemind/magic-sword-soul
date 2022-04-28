@@ -1,4 +1,4 @@
-import { CharacterRepositoryFake } from '../../src/repositories/__mocks__/CharacterRepository';
+import { CharacterRepositoryFake } from '../__mocks__/CharacterRepository';
 import CreateCharacterUseCase from '../../src/useCases/CreateCharacterUseCase';
 import CharacterFactory from '../../src/useCases/CharacterFactory';
 import { CharacterDTO } from '../../src/useCases/CharacterDTO';

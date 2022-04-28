@@ -12,6 +12,8 @@ describe('Validações sobre as entidades de personagens', () => {
     expect(warrior.getSkill).toBe(5);
     expect(warrior.getStrength).toBe(10);
     expect(warrior.getIntelligence).toBe(5);
+    expect(warrior.getName).toBe('Gusmng Thyeks');
+    expect(warrior.getProfession).toBe('warrior');
   });
 
   test('Warrior Attack: 80% da Força + 20% da Destreza', () => {
@@ -28,6 +30,8 @@ describe('Validações sobre as entidades de personagens', () => {
     expect(thief.getSkill).toBe(10);
     expect(thief.getStrength).toBe(4);
     expect(thief.getIntelligence).toBe(4);
+    expect(thief.getName).toBe('Fkmaas Ghetryn');
+    expect(thief.getProfession).toBe('thief');
   });
 
   test('Thief Attack: 25% da Força + 100% da Destreza + 25% da Inteligência', () => {
@@ -44,6 +48,8 @@ describe('Validações sobre as entidades de personagens', () => {
     expect(mage.getSkill).toBe(6);
     expect(mage.getStrength).toBe(5);
     expect(mage.getIntelligence).toBe(10);
+    expect(mage.getName).toBe('Dangalf Musy');
+    expect(mage.getProfession).toBe('mage');
   });
 
   test('Mage Attack: 20% da Força + 50% da Destreza + 150% da Inteligência', () => {

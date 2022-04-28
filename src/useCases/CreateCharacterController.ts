@@ -16,7 +16,7 @@ export default class CreateCharacterController {
     try {
       const props = request.body;
       await validatorDto(CharacterDTO, props);
-      const newCharacter = this.createCharacterUseCase.execute(props);
+      const newCharacter = await this.createCharacterUseCase.execute(props);
 
       return response.status(HTTP_CREATED_CODE).send(newCharacter);
     } catch (error: any) {
