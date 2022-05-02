@@ -16,7 +16,7 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
-describe('Validações sobre o caso de uso CreateCharacter', () => {
+describe('F1 - Criação de um novo personagem', () => {
   test('Cria um novo personagem Warrior ao receber os parâmetros esperados', async () => {
     const warriorProps: CharacterDTO = {
       name: 'Gusnmg_Hujn',

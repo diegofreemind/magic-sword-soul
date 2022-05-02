@@ -1,6 +1,5 @@
-import app from '../../src/index';
-
 import request from 'supertest';
+import app from '../../src/index';
 
 describe.only('POST /character', () => {
   test('Deve retornar o status code 201 ao informar os dados corretos', async () => {
@@ -11,7 +10,6 @@ describe.only('POST /character', () => {
 
     expect(result.statusCode).toEqual(201);
     expect(result.body).toHaveProperty('id');
-
     expect(result.body).toMatchObject(
       expect.objectContaining({
         life: 20,
@@ -31,12 +29,6 @@ describe.only('POST /character', () => {
     });
 
     expect(result.statusCode).toEqual(400);
-    expect(result).toMatchObject(
-      expect.objectContaining({
-        statusCode: 400,
-        body: 'profession must be one of the following values: warrior, thief, mage',
-      })
-    );
   });
 
   test('Deve retornar o status code 404 ao informar o endereço incorreto', async () => {

@@ -1,7 +1,10 @@
 // TODO: add generic props Character<T>?
 
 import { v4 } from 'uuid';
-import { Professions } from '../useCases/CreateCharacter/CharacterDTO';
+import {
+  CharacterStatus,
+  Professions,
+} from '../useCases/CreateCharacter/CharacterDTO';
 
 export abstract class Character {
   constructor(
@@ -11,8 +14,12 @@ export abstract class Character {
     protected skill: number,
     protected strength: number,
     protected intelligence: number,
-    protected id?: string
+    protected id?: string,
+    protected status?: CharacterStatus
   ) {
+    if (!status) {
+      this.status = CharacterStatus.Alive;
+    }
     if (!id) {
       this.id = v4();
     }

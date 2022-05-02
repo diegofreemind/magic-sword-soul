@@ -6,6 +6,11 @@ export enum Professions {
   Mage = 'mage',
 }
 
+export enum CharacterStatus {
+  Alive = 'alive',
+  Dead = 'dead',
+}
+
 export class CharacterDTO {
   @IsIn(Object.values(Professions))
   readonly profession!: string;
