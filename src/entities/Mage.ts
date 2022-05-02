@@ -1,4 +1,4 @@
-import { Professions } from '../useCases/CreateCharacter/CharacterDTO';
+import { CharacterStatus, Professions } from '../shared/enums/Character';
 import { Character } from './Character';
 
 export const MAGE_LIFE_DEFAULT = 12;
@@ -7,7 +7,11 @@ export const MAGE_STRENGTH_DEFAULT = 5;
 export const MAGE_INTELLIGENCE_DEFAULT = 10;
 
 export default class Mage extends Character {
-  constructor(readonly name: string, identifier?: string) {
+  constructor(
+    readonly name: string,
+    identifier?: string,
+    status?: CharacterStatus
+  ) {
     super(
       name,
       Professions.Mage,
@@ -15,7 +19,8 @@ export default class Mage extends Character {
       MAGE_SKILL_DEFAULT,
       MAGE_STRENGTH_DEFAULT,
       MAGE_INTELLIGENCE_DEFAULT,
-      identifier
+      identifier,
+      status
     );
   }
 

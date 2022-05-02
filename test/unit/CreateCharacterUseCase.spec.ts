@@ -1,10 +1,11 @@
 import Mage from '../../src/entities/Mage';
 import Thief from '../../src/entities/Thief';
 import Warrior from '../../src/entities/Warrior';
-import { CharacterDTO } from '../../src/useCases/CreateCharacter/CharacterDTO';
-import CharacterFactory from '../../src/useCases/CreateCharacter/CharacterFactory';
-import CreateCharacterUseCase from '../../src/useCases/CreateCharacter/CreateCharacterUseCase';
 import { CharacterRepositoryFake } from '../__mocks__/CharacterRepository';
+import CharacterFactory from '../../src/useCases/CreateCharacter/CharacterFactory';
+import { CreateCharacterDTO } from '../../src/useCases/CreateCharacter/CreateCharacterDTO';
+import CreateCharacterUseCase from '../../src/useCases/CreateCharacter/CreateCharacterUseCase';
+import { BadRequestException } from '../../src/shared/exceptions/BadRequestException';
 
 const characterRepositoryFake = new CharacterRepositoryFake();
 const sut = new CreateCharacterUseCase(characterRepositoryFake);
@@ -18,7 +19,7 @@ beforeEach(() => {
 
 describe('F1 - Criação de um novo personagem', () => {
   test('Cria um novo personagem Warrior ao receber os parâmetros esperados', async () => {
-    const warriorProps: CharacterDTO = {
+    const warriorProps: CreateCharacterDTO = {
       name: 'Gusnmg_Hujn',
       profession: 'warrior',
     };
@@ -34,7 +35,7 @@ describe('F1 - Criação de um novo personagem', () => {
   });
 
   test('Cria um novo personagem Thief ao receber os parâmetros esperados', async () => {
-    const thiefProps: CharacterDTO = {
+    const thiefProps: CreateCharacterDTO = {
       name: 'Fytr_Hujn',
       profession: 'thief',
     };
@@ -50,7 +51,7 @@ describe('F1 - Criação de um novo personagem', () => {
   });
 
   test('Cria um novo personagem Mage ao receber os parâmetros esperados', async () => {
-    const mageProps: CharacterDTO = {
+    const mageProps: CreateCharacterDTO = {
       name: 'Dangalf_Hujn',
       profession: 'mage',
     };
@@ -66,7 +67,9 @@ describe('F1 - Criação de um novo personagem', () => {
   });
 
   test('Deve retornar um erro ao receber os parâmetros incorretos', async () => {
-    await expect(() => sut.execute({} as CharacterDTO)).rejects.toThrow();
+    await expect(() => sut.execute({} as CreateCharacterDTO)).rejects.toThrow();
+
+    // FIXME: should not be called ( validatorDTO )
     expect(repositorySpy).toHaveBeenCalledTimes(0);
   });
 
@@ -75,15 +78,21 @@ describe('F1 - Criação de um novo personagem', () => {
       sut.execute({ name: 'Gerald', profession: 'witcher' } as any)
     ).rejects.toThrow();
 
-    // TODO: align with DTO validation on controller
+    // FIXME: should not be called ( validatorDTO )
     expect(repositorySpy).toHaveBeenCalledTimes(0);
   });
 
   test('Deve retornar um erro ao tentar criar um personagem já existente', async () => {
-    const warriorProps: CharacterDTO = {
+    const warriorProps: CreateCharacterDTO = {
       name: 'Gusnmg_Hujn',
       profession: 'warrior',
     };
+
+    jest
+      .spyOn(characterRepositoryFake, 'find')
+      .mockResolvedValueOnce([
+        new Warrior(warriorProps.name, warriorProps.profession),
+      ]);
 
     await expect(() => sut.execute(warriorProps)).rejects.toThrow();
     expect(repositorySpy).toHaveBeenCalledTimes(1);

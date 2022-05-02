@@ -1,8 +1,12 @@
-import { ICharacterRepository } from '../../repositories/ICharacterRepository';
+import {
+  ICharacterRepository,
+  IFindQuery,
+  Pagination,
+} from '../../repositories/ICharacterRepository';
 
 export default class ListCharacterUseCase {
   constructor(private characterRepository: ICharacterRepository) {}
-  async execute(pageNumber: number, pageSize: number) {
-    return this.characterRepository.find({});
+  async execute(pagination: Pagination, query?: IFindQuery) {
+    return this.characterRepository.find(query, pagination);
   }
 }

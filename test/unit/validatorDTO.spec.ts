@@ -1,6 +1,6 @@
-import { BadRequestException } from '../../src/shared/exceptions/BadRequestException';
 import { validatorDto } from '../../src/shared/validators/validatorDTO';
-import { CharacterDTO } from '../../src/useCases/CreateCharacter/CharacterDTO';
+import { BadRequestException } from '../../src/shared/exceptions/BadRequestException';
+import { CreateCharacterDTO } from '../../src/useCases/CreateCharacter/CreateCharacterDTO';
 
 describe('Character: Um nome só pode ter letras ou o carácter de "_" (underscore/sublinhado)', () => {
   test('Deve validar nome com o formato esperado', async () => {
@@ -10,7 +10,9 @@ describe('Character: Um nome só pode ter letras ou o carácter de "_" (undersco
     };
 
     // TODO: set custom error ( spaces | underscore )
-    await expect(validatorDto(CharacterDTO, props)).resolves.not.toThrow();
+    await expect(
+      validatorDto(CreateCharacterDTO, props)
+    ).resolves.not.toThrow();
   });
 
   test('Deve retornar um erro ao receber um número junto ao nome', async () => {
@@ -20,7 +22,7 @@ describe('Character: Um nome só pode ter letras ou o carácter de "_" (undersco
     };
 
     try {
-      await validatorDto(CharacterDTO, props);
+      await validatorDto(CreateCharacterDTO, props);
     } catch (error) {
       expect(error).toBeInstanceOf(BadRequestException);
       expect(error).toHaveProperty('message');
@@ -41,7 +43,7 @@ describe('Character: Um nome só pode ter letras ou o carácter de "_" (undersco
     };
 
     try {
-      await validatorDto(CharacterDTO, props);
+      await validatorDto(CreateCharacterDTO, props);
     } catch (error) {
       expect(error).toBeInstanceOf(BadRequestException);
       expect(error).toHaveProperty('message');
@@ -65,7 +67,7 @@ describe('Character: Nenhum nome de personagem pode ter mais que 15 caracteres n
     };
 
     try {
-      await validatorDto(CharacterDTO, props);
+      await validatorDto(CreateCharacterDTO, props);
     } catch (error) {
       expect(error).toBeInstanceOf(BadRequestException);
       expect(error).toHaveProperty('message');
@@ -86,7 +88,7 @@ describe('Character: Nenhum nome de personagem pode ter mais que 15 caracteres n
     };
 
     try {
-      await validatorDto(CharacterDTO, props);
+      await validatorDto(CreateCharacterDTO, props);
     } catch (error) {
       expect(error).toBeInstanceOf(BadRequestException);
       expect(error).toHaveProperty('message');

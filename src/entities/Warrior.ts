@@ -1,4 +1,4 @@
-import { Professions } from '../useCases/CreateCharacter/CharacterDTO';
+import { CharacterStatus, Professions } from '../shared/enums/Character';
 import { Character } from './Character';
 
 export const WARRIOR_LIFE_DEFAULT = 20;
@@ -7,7 +7,11 @@ export const WARRIOR_STRENGTH_DEFAULT = 10;
 export const WARRIOR_INTELLIGENCE_DEFAULT = 5;
 
 export default class Warrior extends Character {
-  constructor(readonly name: string, identifier?: string) {
+  constructor(
+    readonly name: string,
+    identifier?: string,
+    status?: CharacterStatus
+  ) {
     super(
       name,
       Professions.Warrior,
@@ -15,7 +19,8 @@ export default class Warrior extends Character {
       WARRIOR_SKILL_DEFAULT,
       WARRIOR_STRENGTH_DEFAULT,
       WARRIOR_INTELLIGENCE_DEFAULT,
-      identifier
+      identifier,
+      status
     );
   }
 

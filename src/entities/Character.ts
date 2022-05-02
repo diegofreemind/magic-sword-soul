@@ -1,10 +1,7 @@
 // TODO: add generic props Character<T>?
 
 import { v4 } from 'uuid';
-import {
-  CharacterStatus,
-  Professions,
-} from '../useCases/CreateCharacter/CharacterDTO';
+import { Professions, CharacterStatus } from '../shared/enums/Character';
 
 export abstract class Character {
   constructor(

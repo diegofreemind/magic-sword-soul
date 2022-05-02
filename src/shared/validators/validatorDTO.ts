@@ -1,12 +1,12 @@
 import { BadRequestException } from '../exceptions/BadRequestException';
-import { ClassConstructor, plainToClass } from 'class-transformer';
+import { ClassConstructor, instanceToPlain } from 'class-transformer';
 import { validate, ValidationError } from 'class-validator';
 
 export const validatorDto = async <T extends ClassConstructor<any>>(
   dto: T,
   obj: Object
 ) => {
-  const targetClass = plainToClass(dto, obj);
+  const targetClass = instanceToPlain(dto, obj);
   const errors: ValidationError[] = await validate(targetClass);
 
   if (errors.length > 0) {

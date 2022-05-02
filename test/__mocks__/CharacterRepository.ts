@@ -1,22 +1,24 @@
-import Mage from '../../src/entities/Mage';
-import Warrior from '../../src/entities/Warrior';
 import { Character } from '../../src/entities/Character';
-import { CharacterStub } from '../__stubs__/CharacterFactory';
-import { ICharacterRepository } from '../../src/repositories/ICharacterRepository';
+import { CharacterFactoryStub } from '../__stubs__/CharacterFactory';
+import {
+  ICharacterRepository,
+  IFindQuery,
+  Pagination,
+} from '../../src/repositories/ICharacterRepository';
 
 export class CharacterRepositoryFake implements ICharacterRepository {
-  private characterStub: CharacterStub = new CharacterStub(10);
+  InMemoryCharacters: CharacterFactoryStub = new CharacterFactoryStub(10);
 
   findByName(name: string): Promise<Character | undefined> {
-    return jest.mocked(Promise.resolve(new Warrior(name)));
+    return jest.mocked(Promise.resolve(this.InMemoryCharacters.collection[0]));
   }
-  find(query: any): Promise<Character[] | any[]> {
-    return jest.mocked(Promise.resolve(this.characterStub.characterCollection));
+
+  find(query: IFindQuery, pagination?: Pagination): Promise<Character[]> {
+    const result = this.InMemoryCharacters.collection.slice(0, 10);
+    return jest.mocked(Promise.resolve(result));
   }
   findById(id: string): Promise<Character | undefined> {
-    return jest.mocked(
-      Promise.resolve(this.characterStub.characterCollection[0])
-    );
+    return jest.mocked(Promise.resolve(this.InMemoryCharacters.collection[0]));
   }
   save(character: Character): Promise<void> {
     return Promise.resolve();

@@ -1,17 +1,7 @@
 import { IsIn, IsNotEmpty, Matches, MaxLength } from 'class-validator';
+import { Professions } from '../../shared/enums/Character';
 
-export enum Professions {
-  Warrior = 'warrior',
-  Thief = 'thief',
-  Mage = 'mage',
-}
-
-export enum CharacterStatus {
-  Alive = 'alive',
-  Dead = 'dead',
-}
-
-export class CharacterDTO {
+export class CreateCharacterDTO {
   @IsIn(Object.values(Professions))
   readonly profession!: string;
 

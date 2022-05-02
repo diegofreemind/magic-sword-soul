@@ -1,4 +1,4 @@
-import { Professions } from '../useCases/CreateCharacter/CharacterDTO';
+import { CharacterStatus, Professions } from '../shared/enums/Character';
 import { Character } from './Character';
 
 export const THIEF_LIFE_DEFAULT = 15;
@@ -7,7 +7,11 @@ export const THIEF_STRENGTH_DEFAULT = 4;
 export const THIEF_INTELLIGENCE_DEFAULT = 4;
 
 export default class Thief extends Character {
-  constructor(readonly name: string, identifier?: string) {
+  constructor(
+    readonly name: string,
+    identifier?: string,
+    status?: CharacterStatus
+  ) {
     super(
       name,
       Professions.Thief,
@@ -15,7 +19,8 @@ export default class Thief extends Character {
       THIEF_SKILL_DEFAULT,
       THIEF_STRENGTH_DEFAULT,
       THIEF_INTELLIGENCE_DEFAULT,
-      identifier
+      identifier,
+      status
     );
   }
 
