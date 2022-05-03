@@ -1,9 +1,10 @@
 import { Character } from '../../src/entities/Character';
+import { Pagination } from '../../src/shared/interfaces/pagination';
 import { CharacterFactoryStub } from '../__stubs__/CharacterFactory';
+
 import {
   ICharacterRepository,
   IFindQuery,
-  Pagination,
 } from '../../src/repositories/ICharacterRepository';
 
 export class CharacterRepositoryFake implements ICharacterRepository {

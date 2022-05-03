@@ -2,10 +2,11 @@ next commit
 
 # start designing api
 
-- add base pagination ( )
-- add base validations for list ( )
-- add list filter for characters ( )
-- add unit tests | integration tests ( )
+- add base pagination ( x )
+- include results metadata ( )
+- add base validations for list ( x )
+- add list filter for characters ( x )
+- add unit tests | integration tests ( x )
 
 last commit
 

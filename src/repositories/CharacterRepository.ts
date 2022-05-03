@@ -1,10 +1,10 @@
 import { Character } from '../entities/Character';
 import { instanceToPlain } from 'class-transformer';
-import { IFindQuery, Pagination } from './ICharacterRepository';
+import { IFindQuery } from './ICharacterRepository';
+import { Pagination } from '../shared/interfaces/pagination';
 import { ICharacterRepository } from './ICharacterRepository';
 
 export default class CharacterRepository implements ICharacterRepository {
-  // TODO: convert to plain objet before?
   private InMemoryCharacters: Character[] = [];
 
   save(character: Character): Promise<void> {
@@ -12,11 +12,12 @@ export default class CharacterRepository implements ICharacterRepository {
     return Promise.resolve();
   }
 
-  find(query: IFindQuery, pagination?: Pagination): Promise<Character[]> {
-    // TODO: filter by equality -> lodash
+  find(query: IFindQuery, pagination: Pagination): Promise<Character[]> {
     const queryResult = this.InMemoryCharacters.filter((character) =>
       this.filterByProps(character, query)
     );
+
+    console.log({ pagination });
 
     if (pagination) {
       const { pageNumber, pageSize } = pagination;
@@ -35,7 +36,7 @@ export default class CharacterRepository implements ICharacterRepository {
     throw new Error('Method not implemented.');
   }
 
-  private filterByProps(character: Character, query: IFindQuery) {
+  private filterByProps(character: Character, query: IFindQuery): Boolean {
     const literalCharacter = instanceToPlain(character);
     const searchKeys = Object.keys(query);
 

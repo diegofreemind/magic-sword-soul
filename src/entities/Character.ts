@@ -29,6 +29,10 @@ export abstract class Character {
     return this.id;
   }
 
+  getStatus() {
+    return this.status;
+  }
+
   get getLife() {
     return this.life;
   }

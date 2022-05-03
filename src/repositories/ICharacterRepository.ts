@@ -1,10 +1,6 @@
 import { Character } from '../entities/Character';
+import { Pagination } from '../shared/interfaces/pagination';
 import { CharacterStatus } from '../shared/enums/Character';
-
-export type Pagination = {
-  pageNumber: number;
-  pageSize: number;
-};
 
 export interface IFindQuery {
   id?: string;
@@ -17,7 +13,5 @@ export interface ICharacterRepository {
   save(character: Character): Promise<void>;
   findById(id: string): Promise<Character | undefined>;
   findByName(name: string): Promise<Character | undefined>;
-
-  // TODO: review requirements
-  find(query?: IFindQuery, pagination?: Pagination): Promise<Character[]>;
+  find(query: IFindQuery, pagination: Pagination): Promise<Character[]>;
 }

@@ -1,7 +1,7 @@
 import { IsIn, IsString, IsUUID } from 'class-validator';
 import { Professions, CharacterStatus } from '../../shared/enums/Character';
 
-export class FindCharacterDTO {
+export class ListCharacterDTO {
   @IsIn(Object.values(CharacterStatus))
   status?: CharacterStatus;
 
