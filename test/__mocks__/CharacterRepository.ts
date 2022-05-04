@@ -10,7 +10,6 @@ export class CharacterRepositoryFake implements ICharacterRepository {
   findByName(name: string): Promise<Character | undefined> {
     return jest.mocked(Promise.resolve(this.InMemoryCharacters.collection[0]));
   }
-
   find(query: ListCharacterDTO, pagination?: Pagination): Promise<Character[]> {
     const result = this.InMemoryCharacters.collection.slice(0, 10);
     return jest.mocked(Promise.resolve(result));
