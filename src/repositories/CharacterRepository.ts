@@ -1,8 +1,8 @@
 import { Character } from '../entities/Character';
 import { instanceToPlain } from 'class-transformer';
-import { IFindQuery } from './ICharacterRepository';
 import { Pagination } from '../shared/interfaces/pagination';
 import { ICharacterRepository } from './ICharacterRepository';
+import { ListCharacterDTO } from '../useCases/ListCharacter/ListCharacterDTO';
 
 export default class CharacterRepository implements ICharacterRepository {
   private InMemoryCharacters: Character[] = [];
@@ -12,7 +12,7 @@ export default class CharacterRepository implements ICharacterRepository {
     return Promise.resolve();
   }
 
-  find(query: IFindQuery, pagination: Pagination): Promise<Character[]> {
+  find(query: ListCharacterDTO, pagination: Pagination): Promise<Character[]> {
     const queryResult = this.InMemoryCharacters.filter((character) =>
       this.filterByProps(character, query)
     );
@@ -36,7 +36,10 @@ export default class CharacterRepository implements ICharacterRepository {
     throw new Error('Method not implemented.');
   }
 
-  private filterByProps(character: Character, query: IFindQuery): Boolean {
+  private filterByProps(
+    character: Character,
+    query: ListCharacterDTO
+  ): Boolean {
     const literalCharacter = instanceToPlain(character);
     const searchKeys = Object.keys(query);
 

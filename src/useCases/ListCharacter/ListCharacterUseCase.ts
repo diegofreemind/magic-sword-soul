@@ -1,24 +1,21 @@
-import {
-  ICharacterRepository,
-  IFindQuery,
-} from '../../repositories/ICharacterRepository';
+import { ICharacterRepository } from '../../repositories/ICharacterRepository';
+import { DEFAULT_PAGINATION } from '../../shared/constants/pagination';
+import { Pagination } from '../../shared/interfaces/pagination';
 
-import {
-  Pagination,
-  DEFAULT_PAGINATION,
-} from '../../shared/interfaces/pagination';
-
-import { validatorDto } from '../../shared/validators/validatorDTO';
+import { isNotEmptyObject } from 'class-validator';
 import { ListCharacterDTO } from './ListCharacterDTO';
+import { validatorDto } from '../../shared/validators/validatorDTO';
 
 export default class ListCharacterUseCase {
   constructor(private characterRepository: ICharacterRepository) {}
   async execute(
-    query: IFindQuery,
+    query: ListCharacterDTO,
     pagination: Pagination = DEFAULT_PAGINATION
   ) {
-    await validatorDto(ListCharacterDTO, query);
-    // TODO: move to utility -> default values ( DTO )
+    if (isNotEmptyObject(query)) {
+      await validatorDto(ListCharacterDTO, query);
+    }
+
     return this.characterRepository.find(query, pagination);
   }
 }

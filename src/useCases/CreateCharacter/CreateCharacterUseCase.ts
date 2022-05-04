@@ -1,6 +1,6 @@
 import { ICharacterRepository } from '../../repositories/ICharacterRepository';
 import { ConflictException } from '../../shared/exceptions/ConflictException';
-import { DEFAULT_PAGINATION } from '../../shared/interfaces/pagination';
+import { DEFAULT_PAGINATION } from '../../shared/constants/pagination';
 import { validatorDto } from '../../shared/validators/validatorDTO';
 import { CreateCharacterDTO } from './CreateCharacterDTO';
 import { Character } from '../../entities/Character';

@@ -1,6 +1,8 @@
 import { validatorDto } from '../../src/shared/validators/validatorDTO';
+import { ListCharacterDTO } from '../../src/useCases/ListCharacter/ListCharacterDTO';
 import { BadRequestException } from '../../src/shared/exceptions/BadRequestException';
 import { CreateCharacterDTO } from '../../src/useCases/CreateCharacter/CreateCharacterDTO';
+import { CharacterStatus } from '../../src/shared/enums/Character';
 
 describe('Character: Um nome só pode ter letras ou o carácter de "_" (underscore/sublinhado)', () => {
   test('Deve validar nome com o formato esperado', async () => {
@@ -102,5 +104,29 @@ describe('Character: Nenhum nome de personagem pode ter mais que 15 caracteres n
       );
       expect.assertions(3);
     }
+  });
+});
+
+describe('Character: Objetos de transferência de dados devem atender os casos de uso', () => {
+  test('CreateCharacterDTO: Deve retornar um erro ao receber um objeto vazio', async () => {
+    const props = {};
+    await expect(validatorDto(CreateCharacterDTO, props)).rejects.toThrow();
+  });
+
+  test('CreateCharacterDTO: Deve retornar um erro ao receber valores indefinidos', async () => {
+    const props = { name: undefined, profession: undefined };
+    await expect(validatorDto(CreateCharacterDTO, props)).rejects.toThrow();
+  });
+
+  test('ListCharacterDTO: Deve retornar um erro ao receber um objeto vazio', async () => {
+    const props = {};
+    await expect(validatorDto(ListCharacterDTO, props)).rejects.toThrow();
+  });
+
+  test('ListCharacterDTO: Deve aceitar atributos parciais informados', async () => {
+    const props = { status: CharacterStatus.Dead };
+    await expect(validatorDto(ListCharacterDTO, props)).resolves.toBe(
+      undefined
+    );
   });
 });

@@ -1,12 +1,16 @@
 import { BadRequestException } from '../exceptions/BadRequestException';
-import { ClassConstructor, instanceToPlain } from 'class-transformer';
-import { validate, ValidationError } from 'class-validator';
+import { ClassConstructor, plainToInstance } from 'class-transformer';
+import { validate, ValidationError, isNotEmptyObject } from 'class-validator';
 
 export const validatorDto = async <T extends ClassConstructor<any>>(
   dto: T,
   obj: Object
 ) => {
-  const targetClass = instanceToPlain(dto, obj);
+  if (!isNotEmptyObject(obj)) {
+    throw new BadRequestException('Empty Payload');
+  }
+
+  const targetClass = plainToInstance(dto, obj);
   const errors: ValidationError[] = await validate(targetClass);
 
   if (errors.length > 0) {

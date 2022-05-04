@@ -1,10 +1,10 @@
 import { Character } from '../../src/entities/Character';
 import { CharacterStatus } from '../../src/shared/enums/Character';
-import { IFindQuery } from '../../src/repositories/ICharacterRepository';
 import { CharacterRepositoryFake } from '../__mocks__/CharacterRepository';
+import { ListCharacterDTO } from '../../src/useCases/ListCharacter/ListCharacterDTO';
 import ListCharacterUseCase from '../../src/useCases/ListCharacter/ListCharacterUseCase';
 
-const query: IFindQuery = {};
+const query: ListCharacterDTO = {};
 
 const characterRepositoryFake = new CharacterRepositoryFake();
 const sut = new ListCharacterUseCase(characterRepositoryFake);
@@ -48,7 +48,7 @@ describe('F2 - Listar todos os personagens já criados', () => {
         )
       );
 
-    const customQuery: IFindQuery = {
+    const customQuery: Partial<ListCharacterDTO> = {
       status: CharacterStatus.Dead,
     };
 
@@ -75,7 +75,7 @@ describe('F2 - Listar todos os personagens já criados', () => {
         )
       );
 
-    const customQuery: IFindQuery = {
+    const customQuery: Partial<ListCharacterDTO> = {
       status: CharacterStatus.Dead,
     };
 

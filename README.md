@@ -7,6 +7,7 @@ next commit
 - add base validations for list ( x )
 - add list filter for characters ( x )
 - add unit tests | integration tests ( x )
+- include character profession endpoint ( )
 
 last commit
 

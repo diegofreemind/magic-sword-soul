@@ -1,7 +1,7 @@
 import request from 'supertest';
 import app from '../../src/index';
 
-describe.only('POST /character', () => {
+describe('POST /character', () => {
   test('Deve retornar o status code 201 ao informar os dados corretos', async () => {
     const result = await request(app).post('/character').send({
       name: 'Gusnmg_Hujn',

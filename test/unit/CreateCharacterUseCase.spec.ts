@@ -6,6 +6,7 @@ import CharacterFactory from '../../src/useCases/CreateCharacter/CharacterFactor
 import { CreateCharacterDTO } from '../../src/useCases/CreateCharacter/CreateCharacterDTO';
 import CreateCharacterUseCase from '../../src/useCases/CreateCharacter/CreateCharacterUseCase';
 import { BadRequestException } from '../../src/shared/exceptions/BadRequestException';
+import { ConflictException } from '../../src/shared/exceptions/ConflictException';
 
 const characterRepositoryFake = new CharacterRepositoryFake();
 const sut = new CreateCharacterUseCase(characterRepositoryFake);
@@ -67,19 +68,21 @@ describe('F1 - Criação de um novo personagem', () => {
   });
 
   test('Deve retornar um erro ao receber os parâmetros incorretos', async () => {
-    await expect(() => sut.execute({} as CreateCharacterDTO)).rejects.toThrow();
-
-    // FIXME: should not be called ( validatorDTO )
-    expect(repositorySpy).toHaveBeenCalledTimes(0);
+    try {
+      await sut.execute({} as CreateCharacterDTO);
+    } catch (error) {
+      expect(error).toBeInstanceOf(BadRequestException);
+      expect(repositorySpy).toHaveBeenCalledTimes(0);
+    }
   });
 
   test('Deve retornar um erro ao receber uma profissão desconhecida', async () => {
-    await expect(() =>
-      sut.execute({ name: 'Gerald', profession: 'witcher' } as any)
-    ).rejects.toThrow();
-
-    // FIXME: should not be called ( validatorDTO )
-    expect(repositorySpy).toHaveBeenCalledTimes(0);
+    try {
+      await sut.execute({ name: 'Gerald', profession: 'witcher' } as any);
+    } catch (error) {
+      expect(error).toBeInstanceOf(BadRequestException);
+      expect(repositorySpy).toHaveBeenCalledTimes(0);
+    }
   });
 
   test('Deve retornar um erro ao tentar criar um personagem já existente', async () => {
@@ -94,7 +97,11 @@ describe('F1 - Criação de um novo personagem', () => {
         new Warrior(warriorProps.name, warriorProps.profession),
       ]);
 
-    await expect(() => sut.execute(warriorProps)).rejects.toThrow();
-    expect(repositorySpy).toHaveBeenCalledTimes(1);
+    try {
+      await sut.execute(warriorProps);
+    } catch (error) {
+      expect(error).toBeInstanceOf(ConflictException);
+      expect(repositorySpy).toHaveBeenCalledTimes(1);
+    }
   });
 });
