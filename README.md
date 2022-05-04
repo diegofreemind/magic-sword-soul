@@ -1,16 +1,34 @@
-next commit
+# MVP THA
 
-# start designing api
+### Requisitos
 
-- add base pagination ( x )
+node >= v16.15.0
+yarn 1.22.18
+
+### Instalação
+
+`yarn`
+
+### Utilização
+
+Rodar a aplicação
+
+`yarn run start`
+
+Rodar os testes de unidade
+
+`yarn run test:unit`
+
+Rodar os testes de integração
+
+`yarn run test:integration`
+
+Rodar os testes end 2 end
+
+`yarn run test:e2e`
+
+Próximos passos
+
+- update base pagination ( )
 - include results metadata ( )
-- add base validations for list ( x )
-- add list filter for characters ( x )
-- add unit tests | integration tests ( x )
 - include character profession endpoint ( )
-
-last commit
-
-- validate name property constraints ( x )
-- implement CharacterRepository -> save ( x )
-- add tests for Character att contraints ( x )
