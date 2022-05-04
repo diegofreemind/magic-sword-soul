@@ -9,6 +9,7 @@ export default class CharacterRepository implements ICharacterRepository {
 
   save(character: Character): Promise<void> {
     this.InMemoryCharacters.push(character);
+    console.log('[save]', this.InMemoryCharacters);
     return Promise.resolve();
   }
 
@@ -16,8 +17,6 @@ export default class CharacterRepository implements ICharacterRepository {
     const queryResult = this.InMemoryCharacters.filter((character) =>
       this.filterByProps(character, query)
     );
-
-    console.log({ pagination });
 
     if (pagination) {
       const { pageNumber, pageSize } = pagination;
@@ -29,7 +28,10 @@ export default class CharacterRepository implements ICharacterRepository {
   }
 
   findById(id: string): Promise<Character | undefined> {
-    throw new Error('Method not implemented.');
+    console.log('[findById]', this.InMemoryCharacters);
+    return Promise.resolve(
+      this.InMemoryCharacters.find((character) => character.getId === id)
+    );
   }
 
   findByName(name: string): Promise<Character | undefined> {

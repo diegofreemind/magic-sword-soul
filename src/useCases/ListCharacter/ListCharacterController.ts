@@ -1,10 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
+import { HTTP_SUCCESS_CODE } from '../../shared/constants/httpStatusCode';
 import ListCharacterUseCase from '../../useCases/ListCharacter/ListCharacterUseCase';
 
-import { validatorDto } from '../../shared/validators/validatorDTO';
-import { HTTP_SUCCESS_CODE } from '../../shared/constants/httpStatusCode';
-
-// TODO: validate attributes ( Value Object responsability )
 export default class ListCharacterController {
   constructor(private listCharacterUseCase: ListCharacterUseCase) {}
   async handle(

@@ -27,8 +27,14 @@ Rodar os testes end 2 end
 
 `yarn run test:e2e`
 
+Visualizar cobertura de testes
+
+`yarn run test --coverage`
+
 Próximos passos
 
 - update base pagination ( )
 - include results metadata ( )
+- review Character att usage ( )
+- update integration tests validations ( )
 - include character profession endpoint ( )
