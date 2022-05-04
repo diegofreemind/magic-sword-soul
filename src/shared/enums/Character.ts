@@ -8,3 +8,8 @@ export enum CharacterStatus {
   Alive = 'alive',
   Dead = 'dead',
 }
+
+export enum ActionTypes {
+  Attack = 'attack',
+  Speed = 'speed',
+}

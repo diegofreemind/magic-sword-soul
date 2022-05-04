@@ -44,7 +44,7 @@ describe('F2 - Listar todos os personagens já criados', () => {
       .spyOn(characterRepositoryFake, 'find')
       .mockResolvedValueOnce(
         characterStubList.filter(
-          (item) => item.getStatus() === CharacterStatus.Dead
+          (item) => item.getStatus === CharacterStatus.Dead
         )
       );
 
@@ -71,7 +71,7 @@ describe('F2 - Listar todos os personagens já criados', () => {
       .spyOn(characterRepositoryFake, 'find')
       .mockResolvedValueOnce(
         characterStubList.filter(
-          (item) => item.getStatus() === CharacterStatus.Alive
+          (item) => item.getStatus === CharacterStatus.Alive
         )
       );
 

@@ -7,7 +7,7 @@ const chanceGenerator = new Chance();
 
 export class CharacterFactoryStub {
   public collection: Character[] = [];
-  constructor(private quantity: number) {
+  constructor(private quantity: number, status?: CharacterStatus) {
     for (let x = 0; x < this.quantity; x++) {
       const { characterName, characterStatus, characterProfession } =
         this.genCharacterInfo();
@@ -15,8 +15,8 @@ export class CharacterFactoryStub {
       this.collection.push(
         CharacterFactory.create({
           name: characterName,
-          status: characterStatus,
           profession: characterProfession,
+          status: !status ? characterStatus : status,
         })
       );
     }

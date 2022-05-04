@@ -29,12 +29,16 @@ export abstract class Character {
     return this.id;
   }
 
-  getStatus() {
+  get getStatus() {
     return this.status;
   }
 
   get getLife() {
     return this.life;
+  }
+
+  set setLife(points: number) {
+    this.life = points;
   }
 
   get getName() {
