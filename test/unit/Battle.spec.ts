@@ -52,11 +52,9 @@ describe('Validações sobre a entidade de Batalha', () => {
       MIN_BATTLE_CHARACTERS
     );
 
-    if (singleCharacter.getId) {
-      const calcultedAttack = battle.calculateAttack(singleCharacter.getId);
-      expect(calcultedAttack).toBeLessThanOrEqual(singleCharacter.attack());
-      expect(calcultedAttack).toBeGreaterThanOrEqual(0);
-    }
+    const calcultedAttack = battle.calculateAttack(singleCharacter!.getId);
+    expect(calcultedAttack).toBeLessThanOrEqual(singleCharacter.attack());
+    expect(calcultedAttack).toBeGreaterThanOrEqual(0);
   });
 
   test('Deve calcular a velocidade de um determinado personagem', () => {
@@ -67,10 +65,8 @@ describe('Validações sobre a entidade de Batalha', () => {
       MIN_BATTLE_CHARACTERS
     );
 
-    if (singleCharacter.getId) {
-      const calcultedSpeed = battle.calculateSpeed(singleCharacter.getId);
-      expect(calcultedSpeed).toBeLessThanOrEqual(singleCharacter.speed());
-      expect(calcultedSpeed).toBeGreaterThanOrEqual(0);
-    }
+    const calcultedSpeed = battle.calculateSpeed(singleCharacter!.getId);
+    expect(calcultedSpeed).toBeLessThanOrEqual(singleCharacter.speed());
+    expect(calcultedSpeed).toBeGreaterThanOrEqual(0);
   });
 });

@@ -8,18 +8,14 @@ export default class Battle {
   constructor(
     private players: Character[],
     private playersQuantity: number,
+    private id: string = v4(),
     private status?: BattleStatus,
-    private rounds?: Round[],
-    private id?: string
+    private rounds?: Round[]
   ) {
     this.validateBattleConstraints();
 
     if (!status) {
       this.status = BattleStatus.Closed;
-    }
-
-    if (!id) {
-      this.id = v4();
     }
   }
 
@@ -47,11 +43,18 @@ export default class Battle {
     return this.calculateAttribute(ActionTypes.Speed, id);
   }
 
+  calculateDamage(calculatedAttack: number, defensive: string) {
+    const targetPlayer = this.players.find(
+      (player) => player.getId === defensive
+    );
+
+    return targetPlayer!.getLife - calculatedAttack;
+  }
+
   calculateAttribute(method: ActionTypes, id: string) {
     const player = this.players.find((player) => player.getId === id);
     if (player) {
       const calculated = Math.floor(Math.random() * player[method]());
-      console.log('calculating speed', { player, calculated });
       return calculated;
     }
 

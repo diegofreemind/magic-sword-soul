@@ -6,8 +6,8 @@ export interface IBattle {
   id?: string;
   rounds?: Round[];
   status?: BattleStatus;
-  players: Character[];
-  playersQuantity: number;
+  players?: Character[];
+  playersQuantity?: number;
 }
 
 export interface IRound {

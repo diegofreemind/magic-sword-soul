@@ -23,7 +23,7 @@ export abstract class Character {
   abstract speed(): number;
 
   get getId() {
-    return this.id || '';
+    return this.id;
   }
 
   get getStatus() {

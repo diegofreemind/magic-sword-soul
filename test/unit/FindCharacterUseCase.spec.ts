@@ -1,5 +1,5 @@
 import { Character } from '../../src/entities/Character';
-import { CharacterRepositoryFake } from '../__mocks__/CharacterRepository';
+import { CharacterRepositoryFake } from '../__mocks__/CharacterRepositoryFake';
 import FindCharacterUseCase from '../../src/useCases/FindCharacter/FindCharacterUseCase';
 
 const characterRepositoryFake = new CharacterRepositoryFake();

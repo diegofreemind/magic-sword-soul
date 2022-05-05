@@ -1,13 +1,16 @@
+import { BadRequestException } from '../../shared/exceptions/BadRequestException';
 import { ICharacterUseCase } from '../../shared/interfaces/ICharacterUseCase';
 import { IBattleRepository } from '../../repositories/IBattleRepository';
 import { MIN_BATTLE_CHARACTERS } from '../../shared/constants/battlefield';
 import { validatorDto } from '../../shared/validators/validatorDTO';
 import { IMethodCalculate } from '../../shared/interfaces/battle';
+import { BattleStatus } from '../../shared/enums/Battle';
 import { PerformBattleDTO } from './PerformBattleDTO';
 import { Character } from '../../entities/Character';
 import { PerformRoundDTO } from './PerformRoundDTO';
 import Battle from '../../entities/Battle';
 import Round from '../../entities/Round';
+import { isUUID } from 'class-validator';
 
 export default class PerformBattleUseCase {
   constructor(
@@ -29,16 +32,54 @@ export default class PerformBattleUseCase {
     return battle;
   }
 
-  async doRound(props: PerformRoundDTO) {
-    // TODO: perform attack -> subtract life ( turn )
-    // TODO: generate event ( types ) -> start | attacks | end
-  }
+  async executeRound(props: PerformRoundDTO) {
+    await validatorDto(PerformRoundDTO, props);
 
-  async startBattle(battleId: string) {
+    const { offensive, defensive, battleId } = props;
     const battle = await this.battleRepository.findById(battleId);
 
     if (battle) {
-      return this.sortFasterPlayer(battle);
+      const round = new Round(
+        battle.getId,
+        new Date().toISOString(),
+        offensive,
+        defensive
+      );
+
+      const calculatedAttack = battle.calculateAttack(offensive);
+      const calculatedDamage = battle.calculateDamage(
+        calculatedAttack,
+        defensive
+      );
+
+      // TODO: generate event ( types ) -> start | attacks | end
+      round.setCalculatedAttack = calculatedAttack;
+      round.setCalculatedDamage = calculatedDamage;
+
+      return round;
+    }
+
+    throw new Error(`The battle ${battleId} was not found`);
+  }
+
+  async executeBattle(battleId: string) {
+    if (!isUUID(battleId)) {
+      throw new BadRequestException('The battleId format is not valid');
+    }
+
+    const battle = await this.battleRepository.findById(battleId);
+
+    if (battle) {
+      // TODO: apply initialization rules
+      const sortedPlayersBySpeed = this.sortFasterPlayer(battle);
+
+      // TODO: update the battle status to active
+      await this.battleRepository.update(battle.getId, {
+        status: BattleStatus.Active,
+      });
+
+      // TODO: persist into log ( without conflicts )
+      return sortedPlayersBySpeed;
     }
 
     throw new Error(`The battle ${battleId} was not found`);
