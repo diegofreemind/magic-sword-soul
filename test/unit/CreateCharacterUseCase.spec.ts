@@ -1,7 +1,7 @@
 import Mage from '../../src/entities/Mage';
 import Thief from '../../src/entities/Thief';
 import Warrior from '../../src/entities/Warrior';
-import { CharacterRepositoryFake } from '../__mocks__/CharacterRepository';
+import { CharacterRepositoryFake } from '../__mocks__/CharacterRepositoryFake';
 import CharacterFactory from '../../src/useCases/CreateCharacter/CharacterFactory';
 import { CreateCharacterDTO } from '../../src/useCases/CreateCharacter/CreateCharacterDTO';
 import CreateCharacterUseCase from '../../src/useCases/CreateCharacter/CreateCharacterUseCase';

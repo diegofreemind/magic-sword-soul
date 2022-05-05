@@ -2,7 +2,7 @@ import Round from '../../entities/Round';
 import { BattleStatus } from '../enums/Battle';
 import { Character } from '../../entities/Character';
 
-interface IBattle {
+export interface IBattle {
   id?: string;
   rounds?: Round[];
   status?: BattleStatus;
@@ -10,7 +10,7 @@ interface IBattle {
   playersQuantity: number;
 }
 
-interface IRound {
+export interface IRound {
   id: string;
   battleId: string;
   timestamp: Date;
@@ -19,4 +19,9 @@ interface IRound {
   calculatedAttack: number;
   calculatedSpeed: number;
   calculatedDamage: number;
+}
+
+export interface IMethodCalculate {
+  id: string;
+  calculated: number;
 }

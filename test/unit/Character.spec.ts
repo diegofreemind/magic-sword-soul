@@ -10,6 +10,7 @@ describe('Validações sobre as entidades de personagens', () => {
 
     expect(warrior.getLife).toBe(20);
     expect(warrior.getSkill).toBe(5);
+    expect(warrior.getId).toBeDefined();
     expect(warrior.getStrength).toBe(10);
     expect(warrior.getIntelligence).toBe(5);
     expect(warrior.getName).toBe('Gusmng Thyeks');
@@ -34,6 +35,7 @@ describe('Validações sobre as entidades de personagens', () => {
     expect(thief.getLife).toBe(15);
     expect(thief.getSkill).toBe(10);
     expect(thief.getStrength).toBe(4);
+    expect(thief.getId).toBeDefined();
     expect(thief.getIntelligence).toBe(4);
     expect(thief.getName).toBe('Fkmaas Ghetryn');
     expect(thief.getProfession).toBe('thief');
@@ -57,6 +59,7 @@ describe('Validações sobre as entidades de personagens', () => {
     expect(mage.getLife).toBe(12);
     expect(mage.getSkill).toBe(6);
     expect(mage.getStrength).toBe(5);
+    expect(mage.getId).toBeDefined();
     expect(mage.getIntelligence).toBe(10);
     expect(mage.getName).toBe('Dangalf Musy');
     expect(mage.getProfession).toBe('mage');

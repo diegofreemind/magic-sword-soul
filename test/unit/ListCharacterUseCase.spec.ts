@@ -1,6 +1,6 @@
 import { Character } from '../../src/entities/Character';
 import { CharacterStatus } from '../../src/shared/enums/Character';
-import { CharacterRepositoryFake } from '../__mocks__/CharacterRepository';
+import { CharacterRepositoryFake } from '../__mocks__/CharacterRepositoryFake';
 import { ListCharacterDTO } from '../../src/useCases/ListCharacter/ListCharacterDTO';
 import ListCharacterUseCase from '../../src/useCases/ListCharacter/ListCharacterUseCase';
 
@@ -11,6 +11,10 @@ const sut = new ListCharacterUseCase(characterRepositoryFake);
 
 const { InMemoryCharacters } = characterRepositoryFake;
 const characterStubList = InMemoryCharacters.collection;
+
+beforeEach(() => {
+  jest.clearAllMocks();
+});
 
 describe('F2 - Listar todos os personagens já criados', () => {
   test('Deve recuperar uma lista com 10 personagens ( pagina 0 )', async () => {

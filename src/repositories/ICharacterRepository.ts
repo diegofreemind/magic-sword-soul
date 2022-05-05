@@ -1,6 +1,5 @@
 import { Character } from '../entities/Character';
 import { Pagination } from '../shared/interfaces/pagination';
-import { CharacterStatus } from '../shared/enums/Character';
 import { ListCharacterDTO } from '../useCases/ListCharacter/ListCharacterDTO';
 
 export interface ICharacterRepository {
