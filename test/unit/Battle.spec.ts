@@ -1,9 +1,9 @@
+import { MIN_BATTLE_CHARACTERS } from '../../src/shared/constants/battlefield';
 import { CharacterFactoryStub } from '../__stubs__/CharacterFactory';
 import { CharacterStatus } from '../../src/shared/enums/Character';
 import { Character } from '../../src/entities/Character';
 import Battle from '../../src/entities/Battle';
 
-const MIN_BATTLE_CHARACTERS = 2;
 const characterFactory = new CharacterFactoryStub(10);
 
 const aliveCharacters: Character[] = characterFactory.collection.filter(
@@ -68,7 +68,7 @@ describe('Validações sobre a entidade de Batalha', () => {
     );
 
     if (singleCharacter.getId) {
-      const calcultedSpeed = battle.calculatedSpeed(singleCharacter.getId);
+      const calcultedSpeed = battle.calculateSpeed(singleCharacter.getId);
       expect(calcultedSpeed).toBeLessThanOrEqual(singleCharacter.speed());
       expect(calcultedSpeed).toBeGreaterThanOrEqual(0);
     }

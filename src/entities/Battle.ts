@@ -1,44 +1,67 @@
 import { v4 } from 'uuid';
+import Round from './Round';
 import { Character } from './Character';
-import { CharacterStatus, ActionTypes } from '../shared/enums/Character';
-
-const MIN_LUCKY_POINTS = 0;
-const MAX_LUCKY_POINTS = 100;
+import { CharacterStatus } from '../shared/enums/Character';
+import { ActionTypes, BattleStatus } from '../shared/enums/Battle';
 
 export default class Battle {
   constructor(
     private players: Character[],
-    private quantity: number,
-    protected id?: string
+    private playersQuantity: number,
+    private status?: BattleStatus,
+    private rounds?: Round[],
+    private id?: string
   ) {
     this.validateBattleConstraints();
+
+    if (!status) {
+      this.status = BattleStatus.Closed;
+    }
 
     if (!id) {
       this.id = v4();
     }
   }
 
+  get getId() {
+    return this.id;
+  }
+
+  get getPlayers() {
+    return this.players;
+  }
+
+  get getStatus() {
+    return this.status;
+  }
+
+  set setStatus(status: BattleStatus) {
+    this.status = status;
+  }
+
   calculateAttack(id: string, lucky?: number): number {
     return this.calculateAttribute(ActionTypes.Attack, id);
   }
 
-  calculatedSpeed(id: string, lucky?: number) {
+  calculateSpeed(id: string, lucky?: number): number {
     return this.calculateAttribute(ActionTypes.Speed, id);
   }
 
   calculateAttribute(method: ActionTypes, id: string) {
     const player = this.players.find((player) => player.getId === id);
     if (player) {
-      return Math.floor(Math.random() * player[method]());
+      const calculated = Math.floor(Math.random() * player[method]());
+      console.log('calculating speed', { player, calculated });
+      return calculated;
     }
 
     throw new Error(`The player ${id} was not found on this battle`);
   }
 
   validateBattleConstraints() {
-    if (this.players.length < this.quantity) {
+    if (this.players.length < this.playersQuantity) {
       throw new Error(
-        `This battle requires at least ${this.quantity} characters`
+        `This battle requires at least ${this.playersQuantity} characters`
       );
     }
 

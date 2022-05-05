@@ -11,14 +11,11 @@ export abstract class Character {
     protected skill: number,
     protected strength: number,
     protected intelligence: number,
-    protected id?: string,
+    protected id: string = v4(),
     protected status?: CharacterStatus
   ) {
     if (!status) {
       this.status = CharacterStatus.Alive;
-    }
-    if (!id) {
-      this.id = v4();
     }
   }
 
@@ -26,7 +23,7 @@ export abstract class Character {
   abstract speed(): number;
 
   get getId() {
-    return this.id;
+    return this.id || '';
   }
 
   get getStatus() {

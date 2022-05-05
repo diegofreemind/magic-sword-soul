@@ -15,7 +15,15 @@ export class CharacterRepositoryFake implements ICharacterRepository {
     return jest.mocked(Promise.resolve(result));
   }
   findById(id: string): Promise<Character | undefined> {
-    return jest.mocked(Promise.resolve(this.InMemoryCharacters.collection[0]));
+    const { collection } = this.InMemoryCharacters;
+
+    const targetItem = collection.find((c) => c.getId === id);
+
+    const character = targetItem
+      ? targetItem
+      : collection[Math.floor(Math.random() * collection.length)];
+
+    return jest.mocked(Promise.resolve(character));
   }
   save(character: Character): Promise<void> {
     return Promise.resolve();

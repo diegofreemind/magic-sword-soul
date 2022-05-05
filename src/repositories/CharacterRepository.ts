@@ -9,7 +9,6 @@ export default class CharacterRepository implements ICharacterRepository {
 
   save(character: Character): Promise<void> {
     this.InMemoryCharacters.push(character);
-    console.log('[save]', this.InMemoryCharacters);
     return Promise.resolve();
   }
 
@@ -28,7 +27,6 @@ export default class CharacterRepository implements ICharacterRepository {
   }
 
   findById(id: string): Promise<Character | undefined> {
-    console.log('[findById]', this.InMemoryCharacters);
     return Promise.resolve(
       this.InMemoryCharacters.find((character) => character.getId === id)
     );
