@@ -122,7 +122,6 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
 
       const starterPlayer = await sut.executeBattle(battle.getId!);
 
-      console.log(starterPlayer);
       expect(starterPlayer).toBeDefined();
       expect(starterPlayer).toHaveProperty('id');
       expect(starterPlayer).toHaveProperty('calculated');
@@ -164,7 +163,7 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
     });
   });
 
-  describe.only('Deve conduzir uma batalha', () => {
+  describe('Deve conduzir uma batalha', () => {
     test('Deve executar um turno batalha', async () => {
       const [playerOne, playerTwo] = aliveCharacters;
 
@@ -310,7 +309,19 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
       });
     });
 
-    test('Deve subtrair os pontos de vida de um personagem após o dano ser realizado', () => {});
+    test('Deve subtrair os pontos de vida de um personagem após o dano ser realizado', () => {
+      const [defensivePlayer, offensivePlayer] = battle.getPlayers;
+
+      const calculatedAttack = battle.calculateAttack(offensivePlayer.getId);
+
+      const defensiveLife = battle.executeDamage(
+        calculatedAttack,
+        defensivePlayer.getId
+      );
+
+      expect(defensiveLife).toBeDefined();
+      expect(defensiveLife).toBe(defensivePlayer.getLife - calculatedAttack);
+    });
   });
 
   describe('Deve finalizar uma batalha', () => {

@@ -87,11 +87,14 @@ export default class PerformBattleUseCase {
 
       const timestamp = new Date().toISOString();
       const round = new Round(battle.getId, timestamp, offensive, defensive);
+
       const calculatedAttack = battle.calculateAttack(offensive);
       const calculatedDamage = battle.calculateDamage(
         calculatedAttack,
         defensive
       );
+
+      const defensiveLife = battle.executeDamage(calculatedAttack, defensive);
 
       battle.setRounds = round.getId;
       round.setCalculatedAttack = calculatedAttack;
@@ -99,6 +102,8 @@ export default class PerformBattleUseCase {
 
       await this.battleRepository.update(battleId, battle);
       await this.roundRepository.save(round);
+
+      // TODO: validate defensiveLife ( end of battle )
 
       // TODO: persist into log
       return round;
@@ -122,8 +127,6 @@ export default class PerformBattleUseCase {
     }
   }
 
-  async setNextMove() {}
-
   sortFasterPlayer(battle: Battle): IMethodCalculate {
     const sorted = battle.getPlayers.map((player) => {
       return {
@@ -141,8 +144,6 @@ export default class PerformBattleUseCase {
       .find(
         (value, index, arr) => arr.indexOf(value) !== arr.lastIndexOf(value)
       );
-
-    console.log({ isSameSpeed, sortedByFasterPlayer });
 
     if (isSameSpeed) {
       console.log('The calculated_speed was the same for both');

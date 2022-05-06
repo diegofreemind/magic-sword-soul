@@ -51,6 +51,19 @@ export default class Battle {
     this.starterPlayer = id;
   }
 
+  executeDamage(calculatedAttack: number, defensive: string): number {
+    const targetPlayer = this.players.find(
+      (player) => player.getId === defensive
+    );
+
+    if (targetPlayer) {
+      targetPlayer!.setLife -= calculatedAttack;
+      return targetPlayer?.getLife;
+    }
+
+    throw new Error(`The player ${defensive} was not found on this battle`);
+  }
+
   calculateAttack(id: string, lucky?: number): number {
     return this.calculateAttribute(ActionType.Attack, id);
   }
@@ -59,7 +72,7 @@ export default class Battle {
     return this.calculateAttribute(ActionType.Speed, id);
   }
 
-  calculateDamage(calculatedAttack: number, defensive: string) {
+  calculateDamage(calculatedAttack: number, defensive: string): number {
     const targetPlayer = this.players.find(
       (player) => player.getId === defensive
     );
@@ -67,7 +80,7 @@ export default class Battle {
     return targetPlayer!.getLife - calculatedAttack;
   }
 
-  calculateAttribute(method: ActionType, id: string) {
+  calculateAttribute(method: ActionType, id: string): number {
     const player = this.players.find((player) => player.getId === id);
     if (player) {
       const calculated = Math.floor(Math.random() * player[method]());
