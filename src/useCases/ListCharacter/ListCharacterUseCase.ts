@@ -1,9 +1,10 @@
 import { ICharacterRepository } from '../../repositories/ICharacterRepository';
 import { DEFAULT_PAGINATION } from '../../shared/constants/pagination';
-import { Pagination } from '../../shared/interfaces/pagination';
+import { Pagination } from '../../shared/interfaces/IPagination';
 
 import { isNotEmptyObject } from 'class-validator';
 import { ListCharacterDTO } from './ListCharacterDTO';
+import { ICharacter } from '../../shared/interfaces/ICharacter';
 import { validatorDto } from '../../shared/validators/validatorDTO';
 
 export default class ListCharacterUseCase {
@@ -16,6 +17,6 @@ export default class ListCharacterUseCase {
       await validatorDto(ListCharacterDTO, query);
     }
 
-    return this.characterRepository.find(query, pagination);
+    return this.characterRepository.find(query as ICharacter, pagination);
   }
 }

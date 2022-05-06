@@ -1,13 +1,17 @@
-import Round from '../../entities/Round';
 import { BattleStatus } from '../enums/Battle';
 import { Character } from '../../entities/Character';
 
 export interface IBattle {
-  id?: string;
-  rounds?: Round[];
+  readonly id?: string;
+  rounds?: string[];
   status?: BattleStatus;
   players?: Character[];
   playersQuantity?: number;
+}
+
+export interface IBattleState {
+  status?: BattleStatus;
+  lastActionPlayer?: string;
 }
 
 export interface IRound {

@@ -1,9 +1,11 @@
 import { BadRequestException } from '../../shared/exceptions/BadRequestException';
 import { ICharacterUseCase } from '../../shared/interfaces/ICharacterUseCase';
 import { IBattleRepository } from '../../repositories/IBattleRepository';
+import { IRoundRepository } from '../../repositories/IRoundRepository';
+
 import { MIN_BATTLE_CHARACTERS } from '../../shared/constants/battlefield';
+import { IMethodCalculate } from '../../shared/interfaces/IPerformBattle';
 import { validatorDto } from '../../shared/validators/validatorDTO';
-import { IMethodCalculate } from '../../shared/interfaces/battle';
 import { BattleStatus } from '../../shared/enums/Battle';
 import { PerformBattleDTO } from './PerformBattleDTO';
 import { Character } from '../../entities/Character';
@@ -11,11 +13,14 @@ import { PerformRoundDTO } from './PerformRoundDTO';
 import Battle from '../../entities/Battle';
 import Round from '../../entities/Round';
 import { isUUID } from 'class-validator';
+import { UnprocessableException } from '../../shared/exceptions/UnprocessableException';
+import { NotFoundException } from '../../shared/exceptions/NotFoundException';
 
 export default class PerformBattleUseCase {
   constructor(
     private battleRepository: IBattleRepository,
-    private characterUseCase: ICharacterUseCase
+    private characterUseCase: ICharacterUseCase,
+    private roundRepository: IRoundRepository
   ) {}
 
   async createBattle(props: PerformBattleDTO) {
@@ -25,11 +30,44 @@ export default class PerformBattleUseCase {
       this.characterUseCase.findCharacterById(id)
     );
 
-    const characters = await Promise.all(playersAsPromise);
-    const battle = new Battle(characters as Character[], MIN_BATTLE_CHARACTERS);
+    try {
+      const characters = await Promise.all(playersAsPromise);
 
-    await this.battleRepository.save(battle);
-    return battle;
+      const battle = new Battle(
+        characters as Character[],
+        MIN_BATTLE_CHARACTERS
+      );
+
+      await this.battleRepository.save(battle);
+      return battle;
+    } catch (error) {
+      throw new BadRequestException(
+        `Could not create the battle for ${Object.values(props)}`
+      );
+    }
+  }
+
+  async executeBattle(battleId: string) {
+    if (!isUUID(battleId)) {
+      throw new BadRequestException(
+        `The battleId: ${battleId} format is not valid`
+      );
+    }
+
+    const battle = await this.battleRepository.findById(battleId);
+
+    if (battle) {
+      const fastestPlayer = this.sortFasterPlayer(battle);
+
+      battle.setStatus = BattleStatus.Active;
+      battle.setStarterPlayer = fastestPlayer.id;
+      await this.battleRepository.update(battle.getId, battle);
+
+      // TODO: persist into log ( without conflicts )
+      return fastestPlayer;
+    } else {
+      throw new NotFoundException(`The battle ${battleId} was not found`);
+    }
   }
 
   async executeRound(props: PerformRoundDTO) {
@@ -38,54 +76,55 @@ export default class PerformBattleUseCase {
     const { offensive, defensive, battleId } = props;
     const battle = await this.battleRepository.findById(battleId);
 
-    if (battle) {
-      const round = new Round(
-        battle.getId,
-        new Date().toISOString(),
-        offensive,
-        defensive
-      );
+    if (battle?.getStatus === BattleStatus.Active) {
+      const lastRound = await this.getLastMove(battle);
 
+      if (lastRound?.getOffensive === offensive) {
+        throw new UnprocessableException(
+          `This turn is defensive for ${offensive} player`
+        );
+      }
+
+      const timestamp = new Date().toISOString();
+      const round = new Round(battle.getId, timestamp, offensive, defensive);
       const calculatedAttack = battle.calculateAttack(offensive);
       const calculatedDamage = battle.calculateDamage(
         calculatedAttack,
         defensive
       );
 
-      // TODO: generate event ( types ) -> start | attacks | end
+      battle.setRounds = round.getId;
       round.setCalculatedAttack = calculatedAttack;
       round.setCalculatedDamage = calculatedDamage;
 
+      await this.battleRepository.update(battleId, battle);
+      await this.roundRepository.save(round);
+
+      // TODO: persist into log
       return round;
+    } else {
+      throw new UnprocessableException(`The battle ${battleId} is not active`);
     }
-
-    throw new Error(`The battle ${battleId} was not found`);
   }
 
-  async executeBattle(battleId: string) {
-    if (!isUUID(battleId)) {
-      throw new BadRequestException('The battleId format is not valid');
-    }
-
-    const battle = await this.battleRepository.findById(battleId);
-
-    if (battle) {
-      // TODO: apply initialization rules
-      const sortedPlayersBySpeed = this.sortFasterPlayer(battle);
-
-      // TODO: update the battle status to active
-      await this.battleRepository.update(battle.getId, {
-        status: BattleStatus.Active,
-      });
-
-      // TODO: persist into log ( without conflicts )
-      return sortedPlayersBySpeed;
-    }
-
-    throw new Error(`The battle ${battleId} was not found`);
+  async checkBattleState(battle: Battle) {
+    // battle.closed === executeBatte():initial
+    // battle.active === executeRound():ongoing
+    // battle.closed === updateStates():closing
   }
 
-  sortFasterPlayer(battle: Battle): Function | IMethodCalculate {
+  async getLastMove(battle: Battle): Promise<Round | undefined> {
+    const rounds = battle.getRounds.length - 1;
+    const lastRoundId = battle.getRounds[rounds];
+
+    if (lastRoundId) {
+      return this.roundRepository.findById(lastRoundId);
+    }
+  }
+
+  async setNextMove() {}
+
+  sortFasterPlayer(battle: Battle): IMethodCalculate {
     const sorted = battle.getPlayers.map((player) => {
       return {
         id: player.getId,
@@ -112,13 +151,5 @@ export default class PerformBattleUseCase {
 
     const [fastestPlayer] = sortedByFasterPlayer;
     return fastestPlayer;
-  }
-
-  sortNextPlayer(battle: Battle): string {
-    // TODO: sort next player by calculated_speed
-    // TODO: calculateSpeed for each player ( first move - battle_closed )
-    // TODO: verify last event to define next player ( always - battle_active )
-
-    return '';
   }
 }

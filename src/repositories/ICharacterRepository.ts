@@ -1,10 +1,10 @@
 import { Character } from '../entities/Character';
-import { Pagination } from '../shared/interfaces/pagination';
-import { ListCharacterDTO } from '../useCases/ListCharacter/ListCharacterDTO';
+import { ICharacter } from '../shared/interfaces/ICharacter';
+import { Pagination } from '../shared/interfaces/IPagination';
 
 export interface ICharacterRepository {
   save(character: Character): Promise<void>;
   findById(id: string): Promise<Character | undefined>;
-  findByName(name: string): Promise<Character | undefined>;
-  find(query: ListCharacterDTO, pagination: Pagination): Promise<Character[]>;
+  update(id: string, character: Character): Promise<void>;
+  find(query: ICharacter, pagination: Pagination): Promise<Character[]>;
 }

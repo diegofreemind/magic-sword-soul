@@ -1,16 +1,16 @@
 import { v4 } from 'uuid';
-import Round from './Round';
 import { Character } from './Character';
 import { CharacterStatus } from '../shared/enums/Character';
-import { ActionTypes, BattleStatus } from '../shared/enums/Battle';
+import { ActionType, BattleStatus } from '../shared/enums/Battle';
 
 export default class Battle {
   constructor(
     private players: Character[],
     private playersQuantity: number,
     private id: string = v4(),
-    private status?: BattleStatus,
-    private rounds?: Round[]
+    private rounds: string[] = [],
+    private starterPlayer?: string,
+    private status?: BattleStatus
   ) {
     this.validateBattleConstraints();
 
@@ -35,12 +35,28 @@ export default class Battle {
     this.status = status;
   }
 
+  get getRounds() {
+    return this.rounds;
+  }
+
+  set setRounds(round: string) {
+    this.rounds!.push(round);
+  }
+
+  get getStarterPlayer() {
+    return this.starterPlayer;
+  }
+
+  set setStarterPlayer(id: string) {
+    this.starterPlayer = id;
+  }
+
   calculateAttack(id: string, lucky?: number): number {
-    return this.calculateAttribute(ActionTypes.Attack, id);
+    return this.calculateAttribute(ActionType.Attack, id);
   }
 
   calculateSpeed(id: string, lucky?: number): number {
-    return this.calculateAttribute(ActionTypes.Speed, id);
+    return this.calculateAttribute(ActionType.Speed, id);
   }
 
   calculateDamage(calculatedAttack: number, defensive: string) {
@@ -51,7 +67,7 @@ export default class Battle {
     return targetPlayer!.getLife - calculatedAttack;
   }
 
-  calculateAttribute(method: ActionTypes, id: string) {
+  calculateAttribute(method: ActionType, id: string) {
     const player = this.players.find((player) => player.getId === id);
     if (player) {
       const calculated = Math.floor(Math.random() * player[method]());

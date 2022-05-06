@@ -1,8 +1,8 @@
+import { CharacterStatus } from '../../src/shared/enums/Character';
 import { validatorDto } from '../../src/shared/validators/validatorDTO';
 import { ListCharacterDTO } from '../../src/useCases/ListCharacter/ListCharacterDTO';
 import { BadRequestException } from '../../src/shared/exceptions/BadRequestException';
 import { CreateCharacterDTO } from '../../src/useCases/CreateCharacter/CreateCharacterDTO';
-import { CharacterStatus } from '../../src/shared/enums/Character';
 
 describe('Character: Um nome só pode ter letras ou o carácter de "_" (underscore/sublinhado)', () => {
   test('Deve validar nome com o formato esperado', async () => {

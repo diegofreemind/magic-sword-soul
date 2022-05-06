@@ -4,7 +4,13 @@ export enum BattleStatus {
   Finished = 'finished',
 }
 
-export enum ActionTypes {
+export enum ActionType {
   Attack = 'attack',
   Speed = 'speed',
+}
+
+export enum RoundType {
+  Initial = 'initial',
+  OnGoing = 'ongoing',
+  Closing = 'closing',
 }

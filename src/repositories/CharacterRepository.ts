@@ -1,8 +1,8 @@
 import { Character } from '../entities/Character';
 import { instanceToPlain } from 'class-transformer';
-import { Pagination } from '../shared/interfaces/pagination';
+import { ICharacter } from '../shared/interfaces/ICharacter';
+import { Pagination } from '../shared/interfaces/IPagination';
 import { ICharacterRepository } from './ICharacterRepository';
-import { ListCharacterDTO } from '../useCases/ListCharacter/ListCharacterDTO';
 
 export default class CharacterRepository implements ICharacterRepository {
   private InMemoryCharacters: Character[] = [];
@@ -12,7 +12,11 @@ export default class CharacterRepository implements ICharacterRepository {
     return Promise.resolve();
   }
 
-  find(query: ListCharacterDTO, pagination: Pagination): Promise<Character[]> {
+  update(id: string, character: Character): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+
+  find(query: ICharacter, pagination: Pagination): Promise<Character[]> {
     const queryResult = this.InMemoryCharacters.filter((character) =>
       this.filterByProps(character, query)
     );
@@ -32,14 +36,7 @@ export default class CharacterRepository implements ICharacterRepository {
     );
   }
 
-  findByName(name: string): Promise<Character | undefined> {
-    throw new Error('Method not implemented.');
-  }
-
-  private filterByProps(
-    character: Character,
-    query: ListCharacterDTO
-  ): Boolean {
+  private filterByProps(character: Character, query: ICharacter): Boolean {
     const literalCharacter = instanceToPlain(character);
     const searchKeys = Object.keys(query);
 

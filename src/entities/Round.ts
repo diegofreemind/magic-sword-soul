@@ -7,13 +7,28 @@ export default class Round {
     private timestamp: string,
     private offensive: string,
     private defensive: string,
-    private id?: string,
+    private id: string = v4(),
     private calculatedSpeed?: number,
     private calculatedAttack?: number,
     private calculatedDamage?: number
   ) {
     timestamp = new Date().toISOString();
-    id = v4();
+  }
+
+  get getId() {
+    return this.id;
+  }
+
+  get getBattleId() {
+    return this.battleId;
+  }
+
+  get getOffensive() {
+    return this.offensive;
+  }
+
+  get getDefensive() {
+    return this.defensive;
   }
 
   get getCalculatedSpeed() {

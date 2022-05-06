@@ -1,9 +1,13 @@
 import Battle from '../../src/entities/Battle';
 import { IBattleRepository } from '../../src/repositories/IBattleRepository';
-import { IBattle } from '../../src/shared/interfaces/battle';
+import { Pagination } from '../../src/shared/interfaces/IPagination';
+import { IBattle } from '../../src/shared/interfaces/IPerformBattle';
 
 export class BattleRepositoryFake implements IBattleRepository {
-  update(id: string, payload: IBattle): Promise<void> {
+  find(query: IBattle, pagination: Pagination): Promise<Battle[]> {
+    throw new Error('Method not implemented.');
+  }
+  update(id: string, payload: Battle): Promise<void> {
     throw new Error('Method not implemented.');
   }
   save(battle: Battle): Promise<void> {
