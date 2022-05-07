@@ -5,13 +5,17 @@ import { NotFoundException } from '../../src/shared/exceptions/NotFoundException
 import PerformBattleUseCase from '../../src/useCases/PerformBattle/PerformBattleUseCase';
 import { PerformRoundDTO } from '../../src/useCases/PerformBattle/PerformRoundDTO';
 
+import { aliveCharacters, battleStub } from '../__stubs__/PerformBattle';
 import { CharacterUseCaseFake } from '../__mocks__/CharacterUseCaseFake';
 import { BattleRepositoryFake } from '../__mocks__/BattleRepositoryFake';
 import { RoundRepositoryFake } from '../__mocks__/RoundRepositoryFake';
 
-import { CharacterStatus } from '../../src/shared/enums/Character';
+import {
+  IBattleState,
+  IRoundState,
+} from '../../src/shared/interfaces/IPerformBattle';
+
 import { BattleStatus } from '../../src/shared/enums/Battle';
-import { Character } from '../../src/entities/Character';
 import Battle from '../../src/entities/Battle';
 import Round from '../../src/entities/Round';
 
@@ -25,48 +29,8 @@ const sut = new PerformBattleUseCase(
   roundRepositoryFake
 );
 
-let battle: Battle;
-let round: Round;
-
-const aliveCharacters: Character[] =
-  characterUseCaseFake.InMemoryCharacters.filter(
-    (character) => character.getStatus === CharacterStatus.Alive
-  );
-
-// TODO: review side effects ( global)
 beforeEach(async () => {
   jest.clearAllMocks();
-
-  const [playerOne, playerTwo] = aliveCharacters;
-
-  jest
-    .spyOn(battleRepositoryFake, 'save')
-    .mockResolvedValueOnce(Promise.resolve());
-
-  battle = await sut.createBattle({
-    players: [playerOne.getId, playerTwo.getId],
-  });
-
-  battle.setStatus = BattleStatus.Active;
-
-  round = new Round(
-    battle.getId,
-    new Date().toISOString(),
-    playerOne.getId,
-    playerTwo.getId
-  );
-
-  jest
-    .spyOn(battleRepositoryFake, 'findById')
-    .mockResolvedValueOnce(Promise.resolve(battle));
-
-  jest
-    .spyOn(roundRepositoryFake, 'save')
-    .mockResolvedValueOnce(Promise.resolve());
-
-  jest
-    .spyOn(battleRepositoryFake, 'update')
-    .mockResolvedValueOnce(Promise.resolve());
 });
 
 describe('F4 - Realizar o combate entre dois personagens', () => {
@@ -74,13 +38,10 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
     test('Deve criar uma nova batalha', async () => {
       const [playerOne, playerTwo] = aliveCharacters;
 
-      jest
-        .spyOn(battleRepositoryFake, 'save')
-        .mockResolvedValueOnce(Promise.resolve());
-
-      const currentBattle = await sut.createBattle({
-        players: [playerOne!.getId, playerTwo!.getId],
-      });
+      const currentBattle = await battleStub(sut, battleRepositoryFake, [
+        playerOne,
+        playerTwo,
+      ]);
 
       expect(currentBattle).toBeDefined();
       expect(currentBattle?.getId).toBeDefined();
@@ -117,18 +78,37 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
     });
 
     test('Deve abrir uma batalha existente', async () => {
-      // TODO: review players usage ( explicit instances herein )
-      jest.spyOn(battle, 'calculateSpeed').mockReturnValueOnce(100);
+      const [playerOne, playerTwo] = aliveCharacters;
 
-      const starterPlayer = await sut.executeBattle(battle.getId!);
+      const currentBattle = await battleStub(sut, battleRepositoryFake, [
+        playerOne,
+        playerTwo,
+      ]);
 
-      expect(starterPlayer).toBeDefined();
-      expect(starterPlayer).toHaveProperty('id');
-      expect(starterPlayer).toHaveProperty('calculated');
+      jest
+        .spyOn(battleRepositoryFake, 'findById')
+        .mockResolvedValueOnce(Promise.resolve(currentBattle));
+
+      jest.spyOn(currentBattle, 'calculateSpeed').mockReturnValueOnce(100);
+
+      const battleRepoSpy = jest
+        .spyOn(battleRepositoryFake, 'update')
+        .mockResolvedValueOnce(Promise.resolve());
+
+      const startedBattle = await sut.executeBattle(currentBattle.getId!);
+
+      expect(startedBattle).toBeDefined();
+      expect(battleRepoSpy).toHaveBeenCalledTimes(1);
+      expect(startedBattle.getStarterPlayer).toBeDefined();
+      expect(startedBattle.getStatus).toBe(BattleStatus.Active);
     });
 
     test('Deve retornar um erro ao abrir uma batalha inexistente', async () => {
       try {
+        jest
+          .spyOn(battleRepositoryFake, 'findById')
+          .mockResolvedValueOnce(Promise.resolve(undefined));
+
         await sut.executeBattle('2c9160da-0fb9-4d2f-aec6-c0a6de41ae7f');
       } catch (error) {
         expect(error).toBeDefined();
@@ -137,29 +117,51 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
     });
 
     test('Deve definir qual personagem inicializará a batalha', async () => {
-      // TODO: review players usage ( explicit instances herein )
-      jest.spyOn(battle, 'calculateSpeed').mockReturnValueOnce(100);
+      const [playerOne, playerTwo] = aliveCharacters;
 
-      const fastestPlayer = sut.sortFasterPlayer(battle);
+      const currentBattle = await battleStub(sut, battleRepositoryFake, [
+        playerOne,
+        playerTwo,
+      ]);
+
+      jest.spyOn(currentBattle, 'calculateSpeed').mockReturnValueOnce(100);
+
+      const fastestPlayer = sut.sortFasterPlayer(currentBattle);
 
       expect(fastestPlayer).toBeDefined();
-      expect(fastestPlayer.id).toBe(battle.getPlayers[0].getId);
-      expect(fastestPlayer.id).not.toBe(battle.getPlayers[1].getId);
+      expect(fastestPlayer.id).toBe(currentBattle.getPlayers[0].getId);
+      expect(fastestPlayer.id).not.toBe(currentBattle.getPlayers[1].getId);
 
       expect(fastestPlayer).toHaveProperty('id');
       expect(fastestPlayer).toHaveProperty('calculated');
     });
 
     test('Deve recalcular as velocidades de personagens no caso de empate', async () => {
-      jest.spyOn(battle, 'calculateSpeed').mockReturnValueOnce(2);
-      const sutSpy = jest.spyOn(sut, 'executeBattle');
+      const [playerOne, playerTwo] = aliveCharacters;
 
-      // TODO: validate recursive strategy
-      const calculatedRound = await sut.executeBattle(battle.getId!);
+      const currentBattle = await battleStub(sut, battleRepositoryFake, [
+        playerOne,
+        playerTwo,
+      ]);
 
-      expect(sutSpy).toBeCalled();
-      expect(calculatedRound).toHaveProperty('id');
-      expect(calculatedRound).toHaveProperty('calculated');
+      jest
+        .spyOn(battleRepositoryFake, 'findById')
+        .mockResolvedValueOnce(Promise.resolve(currentBattle));
+
+      const battleRepoSpy = jest
+        .spyOn(battleRepositoryFake, 'update')
+        .mockResolvedValueOnce(Promise.resolve());
+
+      const sutSpy = jest.spyOn(sut, 'sortFasterPlayer');
+
+      jest.spyOn(currentBattle, 'calculateSpeed').mockReturnValueOnce(2);
+
+      // TODO: validate recursive strategy toHaveBeenCalledTimes(x)
+      const startedBattle = await sut.executeBattle(currentBattle.getId!);
+
+      expect(sutSpy).toHaveBeenCalledTimes(1);
+      expect(battleRepoSpy).toHaveBeenCalledTimes(1);
+      expect(startedBattle.getStarterPlayer).toBeDefined();
     });
   });
 
@@ -167,31 +169,52 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
     test('Deve executar um turno batalha', async () => {
       const [playerOne, playerTwo] = aliveCharacters;
 
+      const currentBattle = await battleStub(
+        sut,
+        battleRepositoryFake,
+        [playerOne, playerTwo],
+        BattleStatus.Active
+      );
+
       const props: PerformRoundDTO = {
         offensive: playerTwo.getId,
         defensive: playerOne.getId,
-        battleId: battle!.getId,
+        battleId: currentBattle!.getId,
       };
 
-      expect(battle.getRounds).toHaveLength(0);
+      expect(currentBattle.getRounds).toHaveLength(0);
 
       const lastRound = new Round(
-        battle.getId,
+        currentBattle.getId,
         new Date().toISOString(),
         playerOne.getId,
         playerTwo.getId
       );
 
-      battle.setRounds = lastRound.getId;
-      battle.setStarterPlayer = playerOne.getId;
+      currentBattle.setRounds = lastRound.getId;
+      currentBattle.setStarterPlayer = playerOne.getId;
+
+      jest
+        .spyOn(battleRepositoryFake, 'findById')
+        .mockResolvedValueOnce(Promise.resolve(currentBattle));
 
       jest
         .spyOn(sut, 'getLastMove')
         .mockReturnValueOnce(Promise.resolve(lastRound));
 
-      const round = await sut.executeRound(props);
+      const battleRepoSpy = jest
+        .spyOn(battleRepositoryFake, 'update')
+        .mockResolvedValueOnce(Promise.resolve());
+
+      const roundRepoSpy = jest
+        .spyOn(roundRepositoryFake, 'save')
+        .mockResolvedValueOnce(Promise.resolve());
+
+      const { round } = await sut.executeRound(props);
 
       expect(round).toBeDefined();
+      expect(roundRepoSpy).toHaveBeenCalledTimes(1);
+      expect(battleRepoSpy).toHaveBeenCalledTimes(1);
       expect(round.getCalculatedAttack).toBeDefined();
       expect(round.getCalculatedDamage).toBeDefined();
       expect(round.getCalculatedSpeed).not.toBeDefined();
@@ -201,13 +224,10 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
       test('Deve retornar o turno de batalha mais recente', async () => {
         const [playerOne, playerTwo] = aliveCharacters;
 
-        jest
-          .spyOn(battleRepositoryFake, 'save')
-          .mockResolvedValueOnce(Promise.resolve());
-
-        const currentBattle = await sut.createBattle({
-          players: [playerOne.getId, playerTwo.getId],
-        });
+        const currentBattle = await battleStub(sut, battleRepositoryFake, [
+          playerOne,
+          playerTwo,
+        ]);
 
         const firstRound = new Round(
           currentBattle.getId,
@@ -240,27 +260,32 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
       });
 
       test('Deve retornar um erro ao executar um turno fora da ordem esperada', async () => {
-        jest
-          .spyOn(roundRepositoryFake, 'findById')
-          .mockResolvedValueOnce(Promise.resolve(round));
-
         const [playerOne, playerTwo] = aliveCharacters;
+
+        const currentBattle = await battleStub(sut, battleRepositoryFake, [
+          playerOne,
+          playerTwo,
+        ]);
 
         const props: PerformRoundDTO = {
           offensive: playerOne.getId,
           defensive: playerTwo.getId,
-          battleId: battle!.getId,
+          battleId: currentBattle!.getId,
         };
 
         const currentRound = new Round(
-          battle.getId,
+          currentBattle.getId,
           new Date().toISOString(),
           playerOne.getId,
           playerTwo.getId
         );
 
-        battle.setRounds = currentRound.getId;
-        battle.setStarterPlayer = playerOne.getId;
+        currentBattle.setRounds = currentRound.getId;
+        currentBattle.setStarterPlayer = playerOne.getId;
+
+        jest
+          .spyOn(battleRepositoryFake, 'findById')
+          .mockResolvedValueOnce(Promise.resolve(currentBattle));
 
         try {
           await sut.executeRound(props);
@@ -279,13 +304,10 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
       test('Deve retornar um erro ao executar um turno em uma batalha não inicializada', async () => {
         const [playerOne, playerTwo] = aliveCharacters;
 
-        jest
-          .spyOn(battleRepositoryFake, 'save')
-          .mockResolvedValueOnce(Promise.resolve());
-
-        const currentBattle = await sut.createBattle({
-          players: [playerOne.getId, playerTwo.getId],
-        });
+        const currentBattle = await battleStub(sut, battleRepositoryFake, [
+          playerOne,
+          playerTwo,
+        ]);
 
         currentBattle.setStatus = BattleStatus.Closed;
         expect(currentBattle.getStatus).toBe(BattleStatus.Closed);
@@ -309,12 +331,19 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
       });
     });
 
-    test('Deve subtrair os pontos de vida de um personagem após o dano ser realizado', () => {
-      const [defensivePlayer, offensivePlayer] = battle.getPlayers;
+    test('Deve subtrair os pontos de vida de um personagem após o dano ser realizado', async () => {
+      const [defensivePlayer, offensivePlayer] = aliveCharacters;
 
-      const calculatedAttack = battle.calculateAttack(offensivePlayer.getId);
+      const currentBattle = await battleStub(sut, battleRepositoryFake, [
+        defensivePlayer,
+        offensivePlayer,
+      ]);
 
-      const defensiveLife = battle.executeDamage(
+      const calculatedAttack = currentBattle.calculateAttack(
+        offensivePlayer.getId
+      );
+
+      const defensiveLife = currentBattle.executeDamage(
         calculatedAttack,
         defensivePlayer.getId
       );
@@ -325,9 +354,62 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
   });
 
   describe('Deve finalizar uma batalha', () => {
-    test('Deve apresentar o conjunto de turnos da batalha', () => {});
-    test('Não devem ser persistidos os eventos de empate de velocidade', () => {});
-    test('Deve informar qual personagem venceu e qual personagem morreu', () => {});
-    test('Deve atualizar os pontos de vida de um personagem ao concluir', () => {});
+    test('Deve identificar a morte de um personagem', async () => {
+      const [offensivePlayer, defensivePlayer] = aliveCharacters;
+
+      jest
+        .spyOn(battleRepositoryFake, 'save')
+        .mockResolvedValueOnce(Promise.resolve());
+
+      jest
+        .spyOn(battleRepositoryFake, 'update')
+        .mockResolvedValueOnce(Promise.resolve());
+
+      jest
+        .spyOn(roundRepositoryFake, 'save')
+        .mockResolvedValueOnce(Promise.resolve());
+
+      const currentBattle = await sut.createBattle({
+        players: [offensivePlayer.getId, defensivePlayer.getId],
+      });
+
+      const currentRound = new Round(
+        currentBattle.getId,
+        new Date().toISOString(),
+        offensivePlayer.getId,
+        defensivePlayer.getId
+      );
+
+      currentBattle.setStatus = BattleStatus.Active;
+
+      expect(currentBattle).toBeDefined();
+      expect(currentBattle.getStatus).toBe(BattleStatus.Active);
+
+      const roundState: IRoundState = {
+        calculatedAttack: 2,
+        calculatedDamage: defensivePlayer.getLife - 100,
+        executedDamage: {
+          id: defensivePlayer.getId,
+          calculated: defensivePlayer.getLife - 100,
+        },
+      };
+
+      const battleState: IBattleState = {
+        battle: currentBattle,
+        round: currentRound,
+      };
+
+      const sutSpy = jest.spyOn(sut, 'setBattleState');
+      await sut.setBattleState(battleState, roundState);
+
+      expect(sutSpy).toHaveBeenCalledTimes(1);
+      expect(currentBattle.getStatus).toBe(BattleStatus.Finished);
+      expect(sutSpy).toHaveBeenCalledWith(battleState, roundState);
+    });
+
+    test('Repo -> LOG: Deve apresentar o conjunto de turnos da batalha', () => {});
+    test('Repo -> LOG: Não devem ser persistidos os eventos de empate de velocidade', () => {});
+    test('Repo -> LOG: Deve informar qual personagem venceu e qual personagem morreu', () => {});
+    test('Cross Repo: Deve atualizar os pontos de vida de um personagem ao concluir', () => {});
   });
 });

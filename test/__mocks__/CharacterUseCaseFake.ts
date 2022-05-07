@@ -1,6 +1,6 @@
 import { Character } from '../../src/entities/Character';
 import { CharacterRepositoryFake } from './CharacterRepositoryFake';
-import { ICharacterUseCase } from '../../src/shared/interfaces/ICharacterUseCase';
+import { ICharacterUseCase } from '../../src/shared/adapters/ICharacterUseCase';
 
 const characterRepositoryFake = new CharacterRepositoryFake();
 

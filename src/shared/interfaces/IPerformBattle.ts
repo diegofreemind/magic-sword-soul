@@ -1,5 +1,7 @@
-import { BattleStatus } from '../enums/Battle';
 import { Character } from '../../entities/Character';
+import { BattleStatus } from '../enums/Battle';
+import Battle from '../../entities/Battle';
+import Round from '../../entities/Round';
 
 export interface IBattle {
   readonly id?: string;
@@ -10,8 +12,14 @@ export interface IBattle {
 }
 
 export interface IBattleState {
-  status?: BattleStatus;
-  lastActionPlayer?: string;
+  battle: Battle;
+  round: Round;
+}
+
+export interface IRoundState {
+  calculatedAttack: number;
+  calculatedDamage: number;
+  executedDamage: IMethodCalculate;
 }
 
 export interface IRound {

@@ -1,10 +1,12 @@
+import { UnprocessableException } from '../../shared/exceptions/UnprocessableException';
 import { BadRequestException } from '../../shared/exceptions/BadRequestException';
-import { ICharacterUseCase } from '../../shared/interfaces/ICharacterUseCase';
+import { NotFoundException } from '../../shared/exceptions/NotFoundException';
+
+import { ICharacterUseCase } from '../../shared/adapters/ICharacterUseCase';
 import { IBattleRepository } from '../../repositories/IBattleRepository';
 import { IRoundRepository } from '../../repositories/IRoundRepository';
 
 import { MIN_BATTLE_CHARACTERS } from '../../shared/constants/battlefield';
-import { IMethodCalculate } from '../../shared/interfaces/IPerformBattle';
 import { validatorDto } from '../../shared/validators/validatorDTO';
 import { BattleStatus } from '../../shared/enums/Battle';
 import { PerformBattleDTO } from './PerformBattleDTO';
@@ -13,8 +15,12 @@ import { PerformRoundDTO } from './PerformRoundDTO';
 import Battle from '../../entities/Battle';
 import Round from '../../entities/Round';
 import { isUUID } from 'class-validator';
-import { UnprocessableException } from '../../shared/exceptions/UnprocessableException';
-import { NotFoundException } from '../../shared/exceptions/NotFoundException';
+
+import {
+  IMethodCalculate,
+  IBattleState,
+  IRoundState,
+} from '../../shared/interfaces/IPerformBattle';
 
 export default class PerformBattleUseCase {
   constructor(
@@ -23,7 +29,7 @@ export default class PerformBattleUseCase {
     private roundRepository: IRoundRepository
   ) {}
 
-  async createBattle(props: PerformBattleDTO) {
+  async createBattle(props: PerformBattleDTO): Promise<Battle> {
     await validatorDto(PerformBattleDTO, props);
 
     const playersAsPromise = props.players.map((id) =>
@@ -47,7 +53,7 @@ export default class PerformBattleUseCase {
     }
   }
 
-  async executeBattle(battleId: string) {
+  async executeBattle(battleId: string): Promise<Battle> {
     if (!isUUID(battleId)) {
       throw new BadRequestException(
         `The battleId: ${battleId} format is not valid`
@@ -64,58 +70,83 @@ export default class PerformBattleUseCase {
       await this.battleRepository.update(battle.getId, battle);
 
       // TODO: persist into log ( without conflicts )
-      return fastestPlayer;
+      return battle;
     } else {
       throw new NotFoundException(`The battle ${battleId} was not found`);
     }
   }
 
-  async executeRound(props: PerformRoundDTO) {
+  async executeRound(props: PerformRoundDTO): Promise<IBattleState> {
     await validatorDto(PerformRoundDTO, props);
-
     const { offensive, defensive, battleId } = props;
     const battle = await this.battleRepository.findById(battleId);
 
-    if (battle?.getStatus === BattleStatus.Active) {
-      const lastRound = await this.getLastMove(battle);
-
-      if (lastRound?.getOffensive === offensive) {
+    switch (battle?.getStatus) {
+      case BattleStatus.Closed:
+        throw new UnprocessableException(`The battle ${battleId} is closed `);
+      case BattleStatus.Active:
+        return this.runActiveBattle(battle, offensive, defensive);
+      case BattleStatus.Finished:
+        throw new UnprocessableException(`The battle ${battleId} is finished`);
+      default:
         throw new UnprocessableException(
-          `This turn is defensive for ${offensive} player`
+          `Could not process the battle ${battleId}`
         );
-      }
-
-      const timestamp = new Date().toISOString();
-      const round = new Round(battle.getId, timestamp, offensive, defensive);
-
-      const calculatedAttack = battle.calculateAttack(offensive);
-      const calculatedDamage = battle.calculateDamage(
-        calculatedAttack,
-        defensive
-      );
-
-      const defensiveLife = battle.executeDamage(calculatedAttack, defensive);
-
-      battle.setRounds = round.getId;
-      round.setCalculatedAttack = calculatedAttack;
-      round.setCalculatedDamage = calculatedDamage;
-
-      await this.battleRepository.update(battleId, battle);
-      await this.roundRepository.save(round);
-
-      // TODO: validate defensiveLife ( end of battle )
-
-      // TODO: persist into log
-      return round;
-    } else {
-      throw new UnprocessableException(`The battle ${battleId} is not active`);
     }
   }
 
-  async checkBattleState(battle: Battle) {
-    // battle.closed === executeBatte():initial
-    // battle.active === executeRound():ongoing
-    // battle.closed === updateStates():closing
+  async runActiveBattle(battle: Battle, offensive: string, defensive: string) {
+    const lastRound = await this.getLastMove(battle);
+
+    if (lastRound?.getOffensive === offensive) {
+      throw new UnprocessableException(
+        `This turn is defensive for ${offensive} player`
+      );
+    }
+
+    const timestamp = new Date().toISOString();
+    const round = new Round(battle.getId, timestamp, offensive, defensive);
+
+    const calculatedAttack = battle.calculateAttack(offensive);
+    const calculatedDamage = battle.calculateDamage(
+      calculatedAttack,
+      defensive
+    );
+
+    const remainingLife = battle.executeDamage(calculatedAttack, defensive);
+
+    const executedDamage: IMethodCalculate = {
+      id: defensive,
+      calculated: remainingLife,
+    };
+
+    const roundState: IRoundState = {
+      calculatedAttack,
+      calculatedDamage,
+      executedDamage,
+    };
+
+    const battleState: IBattleState = { battle, round };
+    await this.setBattleState(battleState, roundState);
+
+    // TODO: persist into log
+    return battleState;
+  }
+
+  async setBattleState(battleState: IBattleState, roundState: IRoundState) {
+    const { battle, round } = battleState;
+    const { calculatedAttack, calculatedDamage, executedDamage } = roundState;
+
+    battle.setRounds = round.getId;
+    round.setCalculatedAttack = calculatedAttack;
+    round.setCalculatedDamage = calculatedDamage;
+
+    if (executedDamage.calculated <= 0) {
+      battle.setStatus = BattleStatus.Finished;
+    }
+
+    await this.battleRepository.update(battle.getId, battle);
+    await this.roundRepository.save(round);
   }
 
   async getLastMove(battle: Battle): Promise<Round | undefined> {
@@ -135,9 +166,9 @@ export default class PerformBattleUseCase {
       };
     });
 
-    const sortedByFasterPlayer = sorted
-      .sort((a, b) => a.calculated - b.calculated)
-      .reverse();
+    const sortedByFasterPlayer = sorted.sort(
+      (a, b) => a.calculated - b.calculated
+    );
 
     const isSameSpeed = sortedByFasterPlayer
       .map((i) => i.calculated)
@@ -146,11 +177,11 @@ export default class PerformBattleUseCase {
       );
 
     if (isSameSpeed) {
-      console.log('The calculated_speed was the same for both');
+      console.log('The calculated_speed was the same for both players');
       return this.sortFasterPlayer(battle);
     }
 
-    const [fastestPlayer] = sortedByFasterPlayer;
+    const [fastestPlayer] = sortedByFasterPlayer.reverse();
     return fastestPlayer;
   }
 }

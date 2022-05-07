@@ -22,7 +22,8 @@ export default class CharacterFactory {
         return new Thief(name, props.id, props.status);
       case 'mage':
         return new Mage(name, props.id, props.status);
+      default:
+        throw new BadRequestException('Character profession not found');
     }
-    throw new BadRequestException('Character profession not found');
   }
 }

@@ -13,7 +13,7 @@ export class BattleRepositoryFake implements IBattleRepository {
   save(battle: Battle): Promise<void> {
     throw new Error('Method not implemented.');
   }
-  findById(id: string): Promise<Battle> {
+  findById(id: string): Promise<Battle | undefined> {
     throw new Error('Method not implemented.');
   }
 }
