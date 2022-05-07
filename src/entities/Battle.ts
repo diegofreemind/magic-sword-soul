@@ -57,8 +57,10 @@ export default class Battle {
     );
 
     if (targetPlayer) {
-      targetPlayer!.setLife -= calculatedAttack;
-      return targetPlayer?.getLife;
+      const currentLife = targetPlayer.getLife;
+      targetPlayer.setLife = currentLife - calculatedAttack;
+
+      return targetPlayer.getLife;
     }
 
     throw new Error(`The player ${defensive} was not found on this battle`);

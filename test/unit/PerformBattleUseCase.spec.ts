@@ -353,13 +353,26 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
     });
   });
 
-  describe('Deve finalizar uma batalha', () => {
+  describe.only('Deve finalizar uma batalha', () => {
     test('Deve identificar a morte de um personagem', async () => {
-      const [offensivePlayer, defensivePlayer] = aliveCharacters;
+      const [defensivePlayer, offensivePlayer] = aliveCharacters;
+
+      const currentBattle = await battleStub(
+        sut,
+        battleRepositoryFake,
+        [defensivePlayer, offensivePlayer],
+        BattleStatus.Active
+      );
+
+      const props: PerformRoundDTO = {
+        offensive: offensivePlayer.getId,
+        defensive: defensivePlayer.getId,
+        battleId: currentBattle!.getId,
+      };
 
       jest
-        .spyOn(battleRepositoryFake, 'save')
-        .mockResolvedValueOnce(Promise.resolve());
+        .spyOn(battleRepositoryFake, 'findById')
+        .mockResolvedValueOnce(Promise.resolve(currentBattle));
 
       jest
         .spyOn(battleRepositoryFake, 'update')
@@ -369,9 +382,44 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
         .spyOn(roundRepositoryFake, 'save')
         .mockResolvedValueOnce(Promise.resolve());
 
-      const currentBattle = await sut.createBattle({
-        players: [offensivePlayer.getId, defensivePlayer.getId],
-      });
+      jest
+        .spyOn(characterUseCaseFake, 'updateCharacterById')
+        .mockResolvedValueOnce(Promise.resolve());
+
+      const calculatedAttackSpy = jest
+        .spyOn(currentBattle, 'calculateAttack')
+        .mockReturnValueOnce(100);
+
+      const executeDamageSpy = jest.spyOn(currentBattle, 'executeDamage');
+      const sutSpy = jest.spyOn(sut, 'setBattleState');
+
+      const { battle } = await sut.executeRound(props);
+
+      const damagedPlayer = battle.getPlayers.find(
+        (player) => player.getId === defensivePlayer.getId
+      );
+
+      console.log(damagedPlayer);
+
+      expect(battle).toBeDefined();
+      expect(sutSpy).toHaveBeenCalledTimes(1);
+      expect(calculatedAttackSpy).toHaveLastReturnedWith(100);
+
+      expect(executeDamageSpy).toBeCalledTimes(1);
+
+      expect(damagedPlayer!.getLife).toBeLessThanOrEqual(0);
+      expect(currentBattle.getStatus).toBe(BattleStatus.Finished);
+    });
+
+    test('Cross Repo: Deve atualizar os pontos de vida de um personagem ao concluir', async () => {
+      const [defensivePlayer, offensivePlayer] = aliveCharacters;
+
+      const currentBattle = await battleStub(
+        sut,
+        battleRepositoryFake,
+        [defensivePlayer, offensivePlayer],
+        BattleStatus.Active
+      );
 
       const currentRound = new Round(
         currentBattle.getId,
@@ -380,10 +428,13 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
         defensivePlayer.getId
       );
 
-      currentBattle.setStatus = BattleStatus.Active;
+      jest
+        .spyOn(battleRepositoryFake, 'update')
+        .mockResolvedValueOnce(Promise.resolve());
 
-      expect(currentBattle).toBeDefined();
-      expect(currentBattle.getStatus).toBe(BattleStatus.Active);
+      jest
+        .spyOn(roundRepositoryFake, 'save')
+        .mockResolvedValueOnce(Promise.resolve());
 
       const roundState: IRoundState = {
         calculatedAttack: 2,
@@ -399,17 +450,25 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
         round: currentRound,
       };
 
+      const characterRepoSpy = jest
+        .spyOn(characterUseCaseFake, 'updateCharacterById')
+        .mockResolvedValueOnce(Promise.resolve());
+
       const sutSpy = jest.spyOn(sut, 'setBattleState');
       await sut.setBattleState(battleState, roundState);
 
       expect(sutSpy).toHaveBeenCalledTimes(1);
+      expect(characterRepoSpy).toHaveBeenCalledWith(
+        defensivePlayer.getId,
+        defensivePlayer
+      );
+
       expect(currentBattle.getStatus).toBe(BattleStatus.Finished);
       expect(sutSpy).toHaveBeenCalledWith(battleState, roundState);
     });
 
-    test('Repo -> LOG: Deve apresentar o conjunto de turnos da batalha', () => {});
     test('Repo -> LOG: Não devem ser persistidos os eventos de empate de velocidade', () => {});
     test('Repo -> LOG: Deve informar qual personagem venceu e qual personagem morreu', () => {});
-    test('Cross Repo: Deve atualizar os pontos de vida de um personagem ao concluir', () => {});
+    test('Repo -> LOG: Deve apresentar o conjunto de turnos da batalha', () => {});
   });
 });

@@ -129,7 +129,6 @@ export default class PerformBattleUseCase {
     const battleState: IBattleState = { battle, round };
     await this.setBattleState(battleState, roundState);
 
-    // TODO: persist into log
     return battleState;
   }
 
@@ -143,6 +142,15 @@ export default class PerformBattleUseCase {
 
     if (executedDamage.calculated <= 0) {
       battle.setStatus = BattleStatus.Finished;
+
+      const damagedPlayer = battle.getPlayers.find(
+        (player) => player.getId === executedDamage.id
+      );
+
+      await this.characterUseCase.updateCharacterById(
+        executedDamage.id,
+        damagedPlayer!
+      );
     }
 
     await this.battleRepository.update(battle.getId, battle);
