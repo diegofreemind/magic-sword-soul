@@ -16,7 +16,7 @@ export class CharacterRepositoryFake implements ICharacterRepository {
   }
 
   update(id: string, character: ICharacterUpdate): Promise<void> {
-    throw new Error('Method not implemented.');
+    return Promise.resolve();
   }
 
   findById(id: string): Promise<Character | undefined> {

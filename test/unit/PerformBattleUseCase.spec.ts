@@ -462,10 +462,9 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
       await sut.setBattleState(battleState, roundState);
 
       expect(sutSpy).toHaveBeenCalledTimes(1);
-      expect(characterRepoSpy).toHaveBeenCalledWith(
-        defensivePlayer.getId,
-        defensivePlayer
-      );
+      expect(characterRepoSpy).toHaveBeenCalledWith(defensivePlayer.getId, {
+        life: defensivePlayer?.getLife,
+      });
 
       expect(currentBattle.getStatus).toBe(BattleStatus.Finished);
       expect(sutSpy).toHaveBeenCalledWith(battleState, roundState);

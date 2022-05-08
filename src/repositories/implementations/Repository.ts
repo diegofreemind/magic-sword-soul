@@ -25,8 +25,6 @@ export abstract class Repository<T extends BaseEntity, Q, U extends IUpdate>
     const target = this.InMemoryResource.find((battle) => battle.getId === id);
     const index = this.InMemoryResource.indexOf(target!);
 
-    console.log({ before: target, params, set: this.InMemoryResource });
-
     const openEntity = target as any;
 
     Object.keys(params).forEach((key) => {
@@ -34,12 +32,6 @@ export abstract class Repository<T extends BaseEntity, Q, U extends IUpdate>
     });
 
     this.InMemoryResource[index] = openEntity as T;
-
-    console.log({
-      after: target,
-      params,
-      set: this.InMemoryResource,
-    });
 
     return Promise.resolve();
   }

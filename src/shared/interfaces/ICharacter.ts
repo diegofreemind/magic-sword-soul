@@ -15,5 +15,5 @@ export interface ICharacterProps {
 }
 
 export interface ICharacterUpdate {
-  life: number;
+  [key: string]: any;
 }

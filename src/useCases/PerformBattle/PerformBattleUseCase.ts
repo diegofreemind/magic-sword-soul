@@ -150,9 +150,13 @@ export default class PerformBattleUseCase {
         (player) => player.getId === executedDamage.id
       );
 
+      const updateParams = {
+        life: damagedPlayer?.getLife,
+      };
+
       await this.characterUseCase.updateCharacterById(
         executedDamage.id,
-        damagedPlayer!
+        updateParams
       );
     }
 
