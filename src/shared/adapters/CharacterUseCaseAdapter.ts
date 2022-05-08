@@ -1,12 +1,10 @@
 import FindCharacterUseCase from '../../useCases/FindCharacter/FindCharacterUseCase';
-import CharacterRepository from '../../repositories/implementations/CharacterRepository';
 import UpdateCharacterUseCase from '../../useCases/UpdateCharacter/UpdateCharacterUseCase';
 
+import { characterRepository } from '../../repositories/implementations';
 import { ICharacterUpdate } from '../../shared/interfaces/ICharacter';
 import { ICharacterUseCase } from '../adapters/ICharacterUseCase';
 import { Character } from '../../entities/Character';
-
-const characterRepository = new CharacterRepository();
 
 const findCharacterUseCase = new FindCharacterUseCase(characterRepository);
 const updateCharacterUseCase = new UpdateCharacterUseCase(characterRepository);

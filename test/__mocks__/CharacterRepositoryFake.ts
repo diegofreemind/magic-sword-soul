@@ -1,6 +1,6 @@
 import { Character } from '../../src/entities/Character';
 import { Pagination } from '../../src/shared/interfaces/IPagination';
-import { CharacterFactoryStub } from '../__stubs__/CharacterFactory';
+import { CharacterFactoryStub } from '../__stubs__/CharacterFactoryStub';
 import {
   ICharacterQuery,
   ICharacterUpdate,

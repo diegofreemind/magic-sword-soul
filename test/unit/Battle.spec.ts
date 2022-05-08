@@ -1,5 +1,5 @@
 import { MIN_BATTLE_CHARACTERS } from '../../src/shared/constants/battlefield';
-import { CharacterFactoryStub } from '../__stubs__/CharacterFactory';
+import { CharacterFactoryStub } from '../__stubs__/CharacterFactoryStub';
 import { CharacterStatus } from '../../src/shared/enums/Character';
 import { Character } from '../../src/entities/Character';
 import Battle from '../../src/entities/Battle';

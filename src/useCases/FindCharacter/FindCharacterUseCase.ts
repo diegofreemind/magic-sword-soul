@@ -9,6 +9,8 @@ export default class FindCharacterUseCase {
   async execute(id: string): Promise<Character | undefined> {
     if (isUUID(id)) {
       const foundCharacter = await this.characterRepository.findById(id);
+
+      console.log({ useCase: foundCharacter });
       if (foundCharacter) {
         return foundCharacter;
       }

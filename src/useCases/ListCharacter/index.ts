@@ -1,8 +1,7 @@
-import CharacterRepository from '../../repositories/implementations/CharacterRepository';
+import { characterRepository } from '../../repositories/implementations';
 import ListCharacterController from './ListCharacterController';
 import ListCharacterUseCase from './ListCharacterUseCase';
 
-const characterRepository = new CharacterRepository();
 const listCharacterUseCase = new ListCharacterUseCase(characterRepository);
 
 const listCharacterController = new ListCharacterController(

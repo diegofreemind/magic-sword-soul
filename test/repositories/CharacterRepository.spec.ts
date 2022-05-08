@@ -1,5 +1,5 @@
 import { Character } from '../../src/entities/Character';
-import { CharacterFactoryStub } from '../__stubs__/CharacterFactory';
+import { CharacterFactoryStub } from '../__stubs__/CharacterFactoryStub';
 import CharacterRepository from '../../src/repositories/implementations/CharacterRepository';
 
 let repository: CharacterRepository;
