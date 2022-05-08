@@ -1,18 +1,21 @@
 import { Character } from '../../src/entities/Character';
-import { ICharacter } from '../../src/shared/interfaces/ICharacter';
 import { Pagination } from '../../src/shared/interfaces/IPagination';
 import { CharacterFactoryStub } from '../__stubs__/CharacterFactory';
-import { ICharacterRepository } from '../../src/repositories/ICharacterRepository';
+import {
+  ICharacterQuery,
+  ICharacterUpdate,
+} from '../../src/shared/interfaces/ICharacter';
+import { ICharacterRepository } from '../../src/repositories/interfaces/ICharacterRepository';
 
 export class CharacterRepositoryFake implements ICharacterRepository {
   InMemoryCharacters: CharacterFactoryStub = new CharacterFactoryStub(10);
 
-  find(query: ICharacter, pagination?: Pagination): Promise<Character[]> {
+  find(query: ICharacterQuery, pagination?: Pagination): Promise<Character[]> {
     const result = this.InMemoryCharacters.collection.slice(0, 10);
     return jest.mocked(Promise.resolve(result));
   }
 
-  update(id: string, character: Character): Promise<void> {
+  update(id: string, character: ICharacterUpdate): Promise<void> {
     throw new Error('Method not implemented.');
   }
 

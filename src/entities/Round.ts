@@ -1,22 +1,20 @@
 import { v4 } from 'uuid';
+import { BaseEntity } from './BaseEntity';
 
 // TODO: handle as Event ( Aggregation )
-export default class Round {
+export default class Round extends BaseEntity {
   constructor(
     private battleId: string,
     private timestamp: string,
     private offensive: string,
     private defensive: string,
-    private id: string = v4(),
+    id?: string,
     private calculatedSpeed?: number,
     private calculatedAttack?: number,
     private calculatedDamage?: number
   ) {
+    super(id);
     timestamp = new Date().toISOString();
-  }
-
-  get getId() {
-    return this.id;
   }
 
   get getBattleId() {

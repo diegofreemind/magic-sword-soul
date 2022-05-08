@@ -16,7 +16,6 @@ import {
 } from '../../src/shared/interfaces/IPerformBattle';
 
 import { BattleStatus } from '../../src/shared/enums/Battle';
-import Battle from '../../src/entities/Battle';
 import Round from '../../src/entities/Round';
 
 const characterUseCaseFake = new CharacterUseCaseFake();
@@ -159,7 +158,7 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
       // TODO: validate recursive strategy toHaveBeenCalledTimes(x)
       const startedBattle = await sut.executeBattle(currentBattle.getId!);
 
-      expect(sutSpy).toHaveBeenCalledTimes(1);
+      expect(sutSpy).toHaveBeenCalled();
       expect(battleRepoSpy).toHaveBeenCalledTimes(1);
       expect(startedBattle.getStarterPlayer).toBeDefined();
     });
@@ -339,21 +338,23 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
         offensivePlayer,
       ]);
 
+      const originLife = defensivePlayer.getLife;
+
       const calculatedAttack = currentBattle.calculateAttack(
         offensivePlayer.getId
       );
 
-      const defensiveLife = currentBattle.executeDamage(
+      const remainingLife = currentBattle.executeDamage(
         calculatedAttack,
         defensivePlayer.getId
       );
 
-      expect(defensiveLife).toBeDefined();
-      expect(defensiveLife).toBe(defensivePlayer.getLife - calculatedAttack);
+      expect(remainingLife).toBeDefined();
+      expect(remainingLife).toBe(originLife - calculatedAttack);
     });
   });
 
-  describe.only('Deve finalizar uma batalha', () => {
+  describe('Deve finalizar uma batalha', () => {
     test('Deve identificar a morte de um personagem', async () => {
       const [defensivePlayer, offensivePlayer] = aliveCharacters;
 
@@ -399,14 +400,13 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
         (player) => player.getId === defensivePlayer.getId
       );
 
-      console.log(damagedPlayer);
-
       expect(battle).toBeDefined();
       expect(sutSpy).toHaveBeenCalledTimes(1);
       expect(calculatedAttackSpy).toHaveLastReturnedWith(100);
 
       expect(executeDamageSpy).toBeCalledTimes(1);
 
+      console.log({ damagedPlayer });
       expect(damagedPlayer!.getLife).toBeLessThanOrEqual(0);
       expect(currentBattle.getStatus).toBe(BattleStatus.Finished);
     });

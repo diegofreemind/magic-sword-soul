@@ -3,8 +3,8 @@ import { BadRequestException } from '../../shared/exceptions/BadRequestException
 import { NotFoundException } from '../../shared/exceptions/NotFoundException';
 
 import { ICharacterUseCase } from '../../shared/adapters/ICharacterUseCase';
-import { IBattleRepository } from '../../repositories/IBattleRepository';
-import { IRoundRepository } from '../../repositories/IRoundRepository';
+import { IBattleRepository } from '../../repositories/interfaces/IBattleRepository';
+import { IRoundRepository } from '../../repositories/interfaces/IRoundRepository';
 
 import { MIN_BATTLE_CHARACTERS } from '../../shared/constants/battlefield';
 import { validatorDto } from '../../shared/validators/validatorDTO';
@@ -18,6 +18,7 @@ import { isUUID } from 'class-validator';
 
 import {
   IMethodCalculate,
+  IBattleUpdate,
   IBattleState,
   IRoundState,
 } from '../../shared/interfaces/IPerformBattle';
@@ -67,9 +68,12 @@ export default class PerformBattleUseCase {
 
       battle.setStatus = BattleStatus.Active;
       battle.setStarterPlayer = fastestPlayer.id;
-      await this.battleRepository.update(battle.getId, battle);
 
-      // TODO: persist into log ( without conflicts )
+      await this.battleRepository.update(battle.getId, {
+        starterPlayer: battle.getStarterPlayer,
+        status: battle.getStatus,
+      });
+
       return battle;
     } else {
       throw new NotFoundException(`The battle ${battleId} was not found`);
@@ -153,8 +157,12 @@ export default class PerformBattleUseCase {
       );
     }
 
-    await this.battleRepository.update(battle.getId, battle);
     await this.roundRepository.save(round);
+    await this.battleRepository.update(battle.getId, {
+      rounds: battle.getRounds,
+      status: battle.getStatus,
+      players: battle.getPlayers,
+    });
   }
 
   async getLastMove(battle: Battle): Promise<Round | undefined> {

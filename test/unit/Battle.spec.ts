@@ -52,7 +52,7 @@ describe('Validações sobre a entidade de Batalha', () => {
       MIN_BATTLE_CHARACTERS
     );
 
-    const calcultedAttack = battle.calculateAttack(singleCharacter!.getId);
+    const calcultedAttack = battle.calculateAttack(singleCharacter.getId);
     expect(calcultedAttack).toBeLessThanOrEqual(singleCharacter.attack());
     expect(calcultedAttack).toBeGreaterThanOrEqual(0);
   });

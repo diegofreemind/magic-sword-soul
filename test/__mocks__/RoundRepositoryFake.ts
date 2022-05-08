@@ -1,19 +1,22 @@
 import Round from '../../src/entities/Round';
-import { IRoundRepository } from '../../src/repositories/IRoundRepository';
+import { IRoundRepository } from '../../src/repositories/interfaces/IRoundRepository';
 import { Pagination } from '../../src/shared/interfaces/IPagination';
-import { IRound } from '../../src/shared/interfaces/IPerformBattle';
+import {
+  IRoundUpdate,
+  IRoundQuery,
+} from '../../src/shared/interfaces/IPerformBattle';
 
 export class RoundRepositoryFake implements IRoundRepository {
-  save(round: Round): Promise<void> {
+  save(resource: Round): Promise<void> {
     throw new Error('Method not implemented.');
   }
   findById(id: string): Promise<Round> {
     throw new Error('Method not implemented.');
   }
-  update(id: string, round: Round): Promise<void> {
+  update(id: string, params: IRoundUpdate): Promise<void> {
     throw new Error('Method not implemented.');
   }
-  find(query: IRound, pagination: Pagination): Promise<Round[]> {
+  find(query: IRoundQuery, pagination: Pagination): Promise<Round[]> {
     throw new Error('Method not implemented.');
   }
 }

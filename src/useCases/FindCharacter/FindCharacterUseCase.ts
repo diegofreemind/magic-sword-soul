@@ -1,4 +1,4 @@
-import { ICharacterRepository } from '../../repositories/ICharacterRepository';
+import { ICharacterRepository } from '../../repositories/interfaces/ICharacterRepository';
 import { BadRequestException } from '../../shared/exceptions/BadRequestException';
 import { Character } from '../../entities/Character';
 import { isUUID } from 'class-validator';

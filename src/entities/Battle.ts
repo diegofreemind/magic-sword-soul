@@ -2,25 +2,23 @@ import { v4 } from 'uuid';
 import { Character } from './Character';
 import { CharacterStatus } from '../shared/enums/Character';
 import { ActionType, BattleStatus } from '../shared/enums/Battle';
+import { BaseEntity } from './BaseEntity';
 
-export default class Battle {
+export default class Battle extends BaseEntity {
   constructor(
     private players: Character[],
     private playersQuantity: number,
-    private id: string = v4(),
+    id?: string,
     private rounds: string[] = [],
     private starterPlayer?: string,
     private status?: BattleStatus
   ) {
+    super(id);
     this.validateBattleConstraints();
 
     if (!status) {
       this.status = BattleStatus.Closed;
     }
-  }
-
-  get getId() {
-    return this.id;
   }
 
   get getPlayers() {
@@ -57,9 +55,7 @@ export default class Battle {
     );
 
     if (targetPlayer) {
-      const currentLife = targetPlayer.getLife;
-      targetPlayer.setLife = currentLife - calculatedAttack;
-
+      targetPlayer.setLife = targetPlayer.getLife - calculatedAttack;
       return targetPlayer.getLife;
     }
 

@@ -1,6 +1,6 @@
 import FindCharacterUseCase from '../../useCases/FindCharacter/FindCharacterUseCase';
-import CharacterRepository from '../../repositories/CharacterRepository';
-import { ICharacterUseCase } from '../interfaces/ICharacterUseCase';
+import CharacterRepository from '../../repositories/implementations/CharacterRepository';
+import { ICharacterUseCase } from '../adapters/ICharacterUseCase';
 import { Character } from '../../entities/Character';
 
 const characterRepository = new CharacterRepository();

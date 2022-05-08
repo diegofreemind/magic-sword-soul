@@ -2,15 +2,8 @@ import Mage from '../../entities/Mage';
 import Thief from '../../entities/Thief';
 import Warrior from '../../entities/Warrior';
 import { Character } from '../../entities/Character';
-import { CharacterStatus } from '../../shared/enums/Character';
+import { ICharacterProps } from '../../shared/interfaces/ICharacter';
 import { BadRequestException } from '../../shared/exceptions/BadRequestException';
-
-export interface ICharacterProps {
-  id?: string;
-  name: string;
-  profession: string;
-  status?: CharacterStatus;
-}
 
 export default class CharacterFactory {
   static create(props: ICharacterProps): Character {

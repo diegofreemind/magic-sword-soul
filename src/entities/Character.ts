@@ -1,9 +1,9 @@
 // TODO: add generic props Character<T>?
 
-import { v4 } from 'uuid';
+import { BaseEntity } from './BaseEntity';
 import { Professions, CharacterStatus } from '../shared/enums/Character';
 
-export abstract class Character {
+export abstract class Character extends BaseEntity {
   constructor(
     protected name: string,
     protected profession: Professions,
@@ -11,9 +11,10 @@ export abstract class Character {
     protected skill: number,
     protected strength: number,
     protected intelligence: number,
-    protected id: string = v4(),
+    id?: string,
     protected status?: CharacterStatus
   ) {
+    super(id);
     if (!status) {
       this.status = CharacterStatus.Alive;
     }
@@ -21,10 +22,6 @@ export abstract class Character {
 
   abstract attack(): number;
   abstract speed(): number;
-
-  get getId() {
-    return this.id;
-  }
 
   get getStatus() {
     return this.status;
