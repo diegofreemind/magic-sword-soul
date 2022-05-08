@@ -3,6 +3,17 @@ import { BattleStatus } from '../enums/Battle';
 import Battle from '../../entities/Battle';
 import Round from '../../entities/Round';
 
+export interface IUpdate {
+  [key: string]: any;
+}
+
+export interface IBattle {
+  players: Character[];
+  playersQuantity: number;
+  rounds?: string[];
+  starterPlayer?: string;
+}
+
 export interface IBattleQuery {
   readonly id?: string;
   rounds?: string[];

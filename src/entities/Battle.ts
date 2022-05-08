@@ -1,17 +1,17 @@
-import { v4 } from 'uuid';
 import { Character } from './Character';
 import { CharacterStatus } from '../shared/enums/Character';
 import { ActionType, BattleStatus } from '../shared/enums/Battle';
 import { BaseEntity } from './BaseEntity';
+import { IBattle } from '../shared/interfaces/IPerformBattle';
 
-export default class Battle extends BaseEntity {
+export default class Battle extends BaseEntity implements IBattle {
   constructor(
-    private players: Character[],
-    private playersQuantity: number,
+    public players: Character[],
+    public playersQuantity: number,
     id?: string,
-    private rounds: string[] = [],
-    private starterPlayer?: string,
-    private status?: BattleStatus
+    public rounds: string[] = [],
+    public starterPlayer?: string,
+    public status?: BattleStatus
   ) {
     super(id);
     this.validateBattleConstraints();
@@ -23,6 +23,10 @@ export default class Battle extends BaseEntity {
 
   get getPlayers() {
     return this.players;
+  }
+
+  set setPlayers(players: Character[]) {
+    this.players = players;
   }
 
   get getStatus() {

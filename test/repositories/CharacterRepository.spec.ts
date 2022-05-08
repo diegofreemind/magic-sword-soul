@@ -3,7 +3,7 @@ import { CharacterFactoryStub } from '../__stubs__/CharacterFactory';
 import CharacterRepository from '../../src/repositories/implementations/CharacterRepository';
 
 let repository: CharacterRepository;
-const characterFactoryStub = new CharacterFactoryStub(5000);
+const characterFactoryStub = new CharacterFactoryStub(10);
 
 beforeEach(() => {
   repository = new CharacterRepository();

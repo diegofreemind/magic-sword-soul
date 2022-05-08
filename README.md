@@ -33,8 +33,5 @@ Visualizar cobertura de testes
 
 Próximos passos
 
-- update base pagination ( )
-- include results metadata ( )
-- review Character att usage ( )
-- update integration tests validations ( )
-- include character profession endpoint ( )
+- battleRepo.update
+- CharacterUseCaseAdapter

@@ -18,7 +18,6 @@ import { isUUID } from 'class-validator';
 
 import {
   IMethodCalculate,
-  IBattleUpdate,
   IBattleState,
   IRoundState,
 } from '../../shared/interfaces/IPerformBattle';

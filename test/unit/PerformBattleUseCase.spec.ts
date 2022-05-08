@@ -201,6 +201,10 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
         .spyOn(sut, 'getLastMove')
         .mockReturnValueOnce(Promise.resolve(lastRound));
 
+      jest
+        .spyOn(characterUseCaseFake, 'updateCharacterById')
+        .mockResolvedValueOnce(Promise.resolve());
+
       const battleRepoSpy = jest
         .spyOn(battleRepositoryFake, 'update')
         .mockResolvedValueOnce(Promise.resolve());

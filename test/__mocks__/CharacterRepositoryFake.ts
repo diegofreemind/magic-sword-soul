@@ -8,7 +8,7 @@ import {
 import { ICharacterRepository } from '../../src/repositories/interfaces/ICharacterRepository';
 
 export class CharacterRepositoryFake implements ICharacterRepository {
-  InMemoryCharacters: CharacterFactoryStub = new CharacterFactoryStub(10);
+  InMemoryCharacters: CharacterFactoryStub = new CharacterFactoryStub(20);
 
   find(query: ICharacterQuery, pagination?: Pagination): Promise<Character[]> {
     const result = this.InMemoryCharacters.collection.slice(0, 10);

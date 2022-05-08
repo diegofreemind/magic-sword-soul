@@ -1,10 +1,11 @@
-import { BaseEntity } from '../../entities/BaseEntity';
 import { instanceToPlain } from 'class-transformer';
+import { BaseEntity } from '../../entities/BaseEntity';
 
 import { Pagination } from '../../shared/interfaces/IPagination';
+import { IUpdate } from '../../shared/interfaces/IPerformBattle';
 import { IRepository } from '../interfaces/IRepository';
 
-export abstract class Repository<T extends BaseEntity, Q, U>
+export abstract class Repository<T extends BaseEntity, Q, U extends IUpdate>
   implements IRepository<T, Q, U>
 {
   protected InMemoryResource: T[] = [];
@@ -20,7 +21,28 @@ export abstract class Repository<T extends BaseEntity, Q, U>
     );
   }
 
-  abstract update(id: string, params: U): Promise<void>;
+  update(id: string, params: U): Promise<void> {
+    const target = this.InMemoryResource.find((battle) => battle.getId === id);
+    const index = this.InMemoryResource.indexOf(target!);
+
+    console.log({ before: target, params, set: this.InMemoryResource });
+
+    const openEntity = target as any;
+
+    Object.keys(params).forEach((key) => {
+      openEntity[key] = params[key];
+    });
+
+    this.InMemoryResource[index] = openEntity as T;
+
+    console.log({
+      after: target,
+      params,
+      set: this.InMemoryResource,
+    });
+
+    return Promise.resolve();
+  }
 
   find(query: Q, pagination?: Pagination): Promise<T[]> {
     const queryResult = this.InMemoryResource.filter((resource) =>
@@ -41,7 +63,18 @@ export abstract class Repository<T extends BaseEntity, Q, U>
     return Promise.resolve(queryResult);
   }
 
-  private filterByProps(resource: T, query: Q): Boolean {
+  protected updateByProps(resource: T, params: U) {
+    const literalResource = instanceToPlain(resource);
+    const updateKeys = Object.keys(params);
+
+    updateKeys.map((key) => {
+      literalResource[key] = Object(params)[key];
+    });
+
+    return literalResource;
+  }
+
+  protected filterByProps(resource: T, query: Q): Boolean {
     const literalResource = instanceToPlain(resource);
     const searchKeys = Object.keys(query);
 
