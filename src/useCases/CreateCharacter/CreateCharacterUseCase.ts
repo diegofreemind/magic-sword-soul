@@ -1,6 +1,5 @@
 import { ICharacterRepository } from '../../repositories/interfaces/ICharacterRepository';
 import { ConflictException } from '../../shared/exceptions/ConflictException';
-import { DEFAULT_PAGINATION } from '../../shared/constants/pagination';
 import { validatorDto } from '../../shared/validators/validatorDTO';
 import { ICharacterProps } from '../../shared/interfaces/ICharacter';
 import { CreateCharacterDTO } from './CreateCharacterDTO';
@@ -15,13 +14,10 @@ export default class CreateCharacterUseCase {
 
     const { name, profession } = props as ICharacterProps;
 
-    const isAlreadyCreated = await this.characterRepository.find(
-      {
-        name,
-        profession,
-      },
-      DEFAULT_PAGINATION
-    );
+    const isAlreadyCreated = await this.characterRepository.find({
+      name,
+      profession,
+    });
 
     if (isAlreadyCreated?.length > 0) {
       throw new ConflictException(

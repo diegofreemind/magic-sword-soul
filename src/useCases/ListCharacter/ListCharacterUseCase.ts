@@ -1,5 +1,4 @@
 import { ICharacterRepository } from '../../repositories/interfaces/ICharacterRepository';
-import { DEFAULT_PAGINATION } from '../../shared/constants/pagination';
 import { Pagination } from '../../shared/interfaces/IPagination';
 
 import { isNotEmptyObject } from 'class-validator';
@@ -9,10 +8,7 @@ import { validatorDto } from '../../shared/validators/validatorDTO';
 
 export default class ListCharacterUseCase {
   constructor(private characterRepository: ICharacterRepository) {}
-  async execute(
-    query: ListCharacterDTO,
-    pagination: Pagination = DEFAULT_PAGINATION
-  ) {
+  async execute(query: ListCharacterDTO, pagination?: Pagination) {
     if (isNotEmptyObject(query)) {
       await validatorDto(ListCharacterDTO, query);
     }
