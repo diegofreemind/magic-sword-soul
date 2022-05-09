@@ -1,3 +1,4 @@
+import { Character } from '../../entities/Character';
 import { CharacterStatus, Professions } from '../enums/Character';
 
 export interface ICharacterQuery {
@@ -12,6 +13,11 @@ export interface ICharacterProps {
   name: string;
   profession: Professions;
   status?: CharacterStatus;
+}
+
+export interface ICharacterMeta {
+  character: Character;
+  labels: { attack: string; speed: string };
 }
 
 export interface ICharacterUpdate {

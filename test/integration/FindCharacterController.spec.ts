@@ -12,13 +12,8 @@ describe('Detalhes de personagem', () => {
       const result = await request(app).get('/character/' + preset.body.id);
 
       expect(result.statusCode).toEqual(200);
-      expect(result.body).toHaveProperty('id');
-      expect(result.body).toMatchObject(
-        expect.objectContaining({
-          name: 'Gusnmg_Hujn',
-          profession: 'warrior',
-        })
-      );
+      expect(result.body).toHaveProperty('character');
+      expect(result.body?.character).toMatchObject(preset.body);
     });
 
     test('Deve retornar o status 400 ao informar parametros incorretos', async () => {

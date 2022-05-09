@@ -1,10 +1,13 @@
-import { CharacterStatus, Professions } from '../shared/enums/Character';
-import { Character } from './Character';
+import {
+  THIEF_LIFE_DEFAULT,
+  THIEF_SKILL_DEFAULT,
+  THIEF_STRENGTH_DEFAULT,
+  THIEF_INTELLIGENCE_DEFAULT,
+} from '../shared/constants/character';
 
-export const THIEF_LIFE_DEFAULT = 15;
-export const THIEF_SKILL_DEFAULT = 10;
-export const THIEF_STRENGTH_DEFAULT = 4;
-export const THIEF_INTELLIGENCE_DEFAULT = 4;
+import { CharacterStatus, Professions } from '../shared/enums/Character';
+import { ThiefLabels } from '../shared/templates/CharacterLabels';
+import { Character } from './Character';
 
 export default class Thief extends Character {
   constructor(
@@ -24,7 +27,13 @@ export default class Thief extends Character {
     );
   }
 
-  // TODO: think about magic numbers *( code smells )
+  labels() {
+    return ThiefLabels({
+      skill: THIEF_SKILL_DEFAULT,
+      strength: THIEF_STRENGTH_DEFAULT,
+      intelligence: THIEF_INTELLIGENCE_DEFAULT,
+    });
+  }
 
   speed(): number {
     return THIEF_SKILL_DEFAULT * 0.8;

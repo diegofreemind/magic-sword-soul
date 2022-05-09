@@ -9,7 +9,7 @@ describe('F3 - Ter os detalhes de um personagem específico', () => {
   test('Deve recuperar um personagem ao informar um id no formato válido', async () => {
     await expect(
       sut.execute('ff6c1a7a-52f7-425b-a7be-366157097358')
-    ).resolves.toBeInstanceOf(Character);
+    ).resolves.toBeInstanceOf(Object);
   });
 
   test('Deve retornar um erro ao informar um id no formato inválido', async () => {

@@ -1,17 +1,22 @@
 import { ICharacterRepository } from '../../repositories/interfaces/ICharacterRepository';
 import { BadRequestException } from '../../shared/exceptions/BadRequestException';
+import { NotFoundException } from '../../shared/exceptions/NotFoundException';
+
 import { Character } from '../../entities/Character';
 import { isUUID } from 'class-validator';
-import { NotFoundException } from '../../shared/exceptions/NotFoundException';
+import { ICharacterMeta } from '../../shared/interfaces/ICharacter';
 
 export default class FindCharacterUseCase {
   constructor(private characterRepository: ICharacterRepository) {}
-  async execute(id: string): Promise<Character | undefined> {
+  async execute(id: string): Promise<ICharacterMeta | Character | undefined> {
     if (isUUID(id)) {
       const foundCharacter = await this.characterRepository.findById(id);
 
       if (foundCharacter) {
-        return foundCharacter;
+        const character = foundCharacter;
+        const labels = foundCharacter?.labels();
+
+        return { character, labels };
       }
 
       throw new NotFoundException(`The character ${id} was not found`);

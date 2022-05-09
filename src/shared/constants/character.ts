@@ -1,0 +1,14 @@
+export const MAGE_LIFE_DEFAULT = 12;
+export const MAGE_SKILL_DEFAULT = 6;
+export const MAGE_STRENGTH_DEFAULT = 5;
+export const MAGE_INTELLIGENCE_DEFAULT = 10;
+
+export const THIEF_LIFE_DEFAULT = 15;
+export const THIEF_SKILL_DEFAULT = 10;
+export const THIEF_STRENGTH_DEFAULT = 4;
+export const THIEF_INTELLIGENCE_DEFAULT = 4;
+
+export const WARRIOR_LIFE_DEFAULT = 20;
+export const WARRIOR_SKILL_DEFAULT = 5;
+export const WARRIOR_STRENGTH_DEFAULT = 10;
+export const WARRIOR_INTELLIGENCE_DEFAULT = 5;

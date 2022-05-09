@@ -1,10 +1,13 @@
-import { CharacterStatus, Professions } from '../shared/enums/Character';
-import { Character } from './Character';
+import {
+  WARRIOR_LIFE_DEFAULT,
+  WARRIOR_SKILL_DEFAULT,
+  WARRIOR_STRENGTH_DEFAULT,
+  WARRIOR_INTELLIGENCE_DEFAULT,
+} from '../shared/constants/character';
 
-export const WARRIOR_LIFE_DEFAULT = 20;
-export const WARRIOR_SKILL_DEFAULT = 5;
-export const WARRIOR_STRENGTH_DEFAULT = 10;
-export const WARRIOR_INTELLIGENCE_DEFAULT = 5;
+import { CharacterStatus, Professions } from '../shared/enums/Character';
+import { WarriorLabels } from '../shared/templates/CharacterLabels';
+import { Character } from './Character';
 
 export default class Warrior extends Character {
   constructor(
@@ -24,7 +27,13 @@ export default class Warrior extends Character {
     );
   }
 
-  // TODO: think about magic numbers *( code smells )
+  labels() {
+    return WarriorLabels({
+      skill: WARRIOR_SKILL_DEFAULT,
+      strength: WARRIOR_STRENGTH_DEFAULT,
+      intelligence: WARRIOR_INTELLIGENCE_DEFAULT,
+    });
+  }
 
   speed(): number {
     return WARRIOR_SKILL_DEFAULT * 0.6 + WARRIOR_INTELLIGENCE_DEFAULT * 0.2;

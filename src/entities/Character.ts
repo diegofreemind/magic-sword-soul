@@ -1,5 +1,3 @@
-// TODO: add generic props Character<T>?
-
 import { BaseEntity } from './BaseEntity';
 import { Professions, CharacterStatus } from '../shared/enums/Character';
 
@@ -22,6 +20,7 @@ export abstract class Character extends BaseEntity {
 
   abstract attack(): number;
   abstract speed(): number;
+  abstract labels(): { attack: string; speed: string };
 
   get getStatus() {
     return this.status;

@@ -1,10 +1,13 @@
-import { CharacterStatus, Professions } from '../shared/enums/Character';
-import { Character } from './Character';
+import {
+  MAGE_LIFE_DEFAULT,
+  MAGE_SKILL_DEFAULT,
+  MAGE_STRENGTH_DEFAULT,
+  MAGE_INTELLIGENCE_DEFAULT,
+} from '../shared/constants/character';
 
-export const MAGE_LIFE_DEFAULT = 12;
-export const MAGE_SKILL_DEFAULT = 6;
-export const MAGE_STRENGTH_DEFAULT = 5;
-export const MAGE_INTELLIGENCE_DEFAULT = 10;
+import { CharacterStatus, Professions } from '../shared/enums/Character';
+import { MageLabels } from '../shared/templates/CharacterLabels';
+import { Character } from './Character';
 
 export default class Mage extends Character {
   constructor(
@@ -22,6 +25,14 @@ export default class Mage extends Character {
       identifier,
       status
     );
+  }
+
+  labels() {
+    return MageLabels({
+      skill: MAGE_SKILL_DEFAULT,
+      strength: MAGE_STRENGTH_DEFAULT,
+      intelligence: MAGE_INTELLIGENCE_DEFAULT,
+    });
   }
 
   speed(): number {
