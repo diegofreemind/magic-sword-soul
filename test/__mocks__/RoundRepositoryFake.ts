@@ -4,7 +4,7 @@ import { Pagination } from '../../src/shared/interfaces/IPagination';
 import {
   IRoundUpdate,
   IRoundQuery,
-} from '../../src/shared/interfaces/IPerformBattle';
+} from '../../src/shared/interfaces/IPerformRound';
 
 export class RoundRepositoryFake implements IRoundRepository {
   save(resource: Round): Promise<void> {

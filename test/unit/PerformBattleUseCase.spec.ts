@@ -10,14 +10,12 @@ import { CharacterUseCaseFake } from '../__mocks__/CharacterUseCaseFake';
 import { BattleRepositoryFake } from '../__mocks__/BattleRepositoryFake';
 import { RoundRepositoryFake } from '../__mocks__/RoundRepositoryFake';
 
-import {
-  IBattleState,
-  IRoundState,
-} from '../../src/shared/interfaces/IPerformBattle';
+import { IBattleState } from '../../src/shared/interfaces/IPerformBattle';
 
 import Round from '../../src/entities/Round';
-import { BattleStatus } from '../../src/shared/enums/Battle';
+import { BattleStatus, RoundType } from '../../src/shared/enums/Battle';
 import { CharacterStatus } from '../../src/shared/enums/Character';
+import { IRoundState } from '../../src/shared/interfaces/IPerformRound';
 
 const characterUseCaseFake = new CharacterUseCaseFake();
 const battleRepositoryFake = new BattleRepositoryFake();
@@ -89,6 +87,10 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
         .spyOn(battleRepositoryFake, 'findById')
         .mockResolvedValueOnce(Promise.resolve(currentBattle));
 
+      jest
+        .spyOn(roundRepositoryFake, 'save')
+        .mockResolvedValueOnce(Promise.resolve());
+
       jest.spyOn(currentBattle, 'calculateSpeed').mockReturnValueOnce(100);
 
       const battleRepoSpy = jest
@@ -148,6 +150,10 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
         .spyOn(battleRepositoryFake, 'findById')
         .mockResolvedValueOnce(Promise.resolve(currentBattle));
 
+      jest
+        .spyOn(roundRepositoryFake, 'save')
+        .mockResolvedValueOnce(Promise.resolve());
+
       const battleRepoSpy = jest
         .spyOn(battleRepositoryFake, 'update')
         .mockResolvedValueOnce(Promise.resolve());
@@ -184,12 +190,15 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
 
       const lastRound = new Round(
         currentBattle.getId,
-        new Date().toISOString(),
         playerOne.getId,
         playerTwo.getId
       );
 
-      currentBattle.setRounds = lastRound.getId;
+      currentBattle.setRounds = {
+        id: lastRound.getId,
+        type: RoundType.Initial,
+      };
+
       currentBattle.setStarterPlayer = playerOne.getId;
 
       jest
@@ -200,8 +209,8 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
         .spyOn(roundRepositoryFake, 'findById')
         .mockResolvedValueOnce(Promise.resolve(undefined));
 
-      await expect(sut.executeRound(props)).rejects.toBeInstanceOf(
-        UnprocessableException
+      await expect(sut.executeRound(props)).rejects.toThrowError(
+        `This initial turn is offensive for ${playerOne.getId} player`
       );
     });
   });
@@ -227,12 +236,15 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
 
       const lastRound = new Round(
         currentBattle.getId,
-        new Date().toISOString(),
         playerOne.getId,
         playerTwo.getId
       );
 
-      currentBattle.setRounds = lastRound.getId;
+      currentBattle.setRounds = {
+        id: lastRound.getId,
+        type: RoundType.OnGoing,
+      };
+
       currentBattle.setStarterPlayer = playerOne.getId;
 
       jest
@@ -276,14 +288,12 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
 
         const firstRound = new Round(
           currentBattle.getId,
-          new Date().toISOString(),
           playerOne.getId,
           playerTwo.getId
         );
 
         const secondRound = new Round(
           currentBattle.getId,
-          new Date().toISOString(),
           playerTwo.getId,
           playerOne.getId
         );
@@ -292,8 +302,15 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
           .spyOn(roundRepositoryFake, 'findById')
           .mockResolvedValueOnce(Promise.resolve(secondRound));
 
-        currentBattle.setRounds = firstRound.getId;
-        currentBattle.setRounds = secondRound.getId;
+        currentBattle.setRounds = {
+          id: firstRound.getId,
+          type: RoundType.OnGoing,
+        };
+
+        currentBattle.setRounds = {
+          id: secondRound.getId,
+          type: RoundType.OnGoing,
+        };
 
         expect(currentBattle.getRounds).toHaveLength(2);
 
@@ -320,12 +337,15 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
 
         const currentRound = new Round(
           currentBattle.getId,
-          new Date().toISOString(),
           playerOne.getId,
           playerTwo.getId
         );
 
-        currentBattle.setRounds = currentRound.getId;
+        currentBattle.setRounds = {
+          id: currentRound.getId,
+          type: RoundType.OnGoing,
+        };
+
         currentBattle.setStarterPlayer = playerOne.getId;
 
         jest
@@ -471,7 +491,6 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
 
       const currentRound = new Round(
         currentBattle.getId,
-        new Date().toISOString(),
         offensivePlayer.getId,
         defensivePlayer.getId
       );

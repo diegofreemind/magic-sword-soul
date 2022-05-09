@@ -19,7 +19,6 @@ describe('RoundRepository:', () => {
 
     const lastRound = new Round(
       battleOne.getId,
-      new Date().toISOString(),
       playerOne.getId,
       playerTwo.getId
     );
@@ -42,21 +41,18 @@ describe('RoundRepository:', () => {
 
     const anotherRound = new Round(
       battleTwo.getId,
-      new Date().toISOString(),
       playerOne.getId,
       playerTwo.getId
     );
 
     const roundOne = new Round(
       battleOne.getId,
-      new Date().toISOString(),
       playerOne.getId,
       playerTwo.getId
     );
 
     const roundTwo = new Round(
       battleOne.getId,
-      new Date().toISOString(),
       playerTwo.getId,
       playerOne.getId
     );
@@ -88,7 +84,6 @@ describe('RoundRepository:', () => {
 
     const lastRound = new Round(
       battleOne.getId,
-      new Date().toISOString(),
       playerOne.getId,
       playerTwo.getId
     );

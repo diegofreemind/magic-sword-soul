@@ -8,7 +8,7 @@ import { IRoundRepository } from '../../repositories/interfaces/IRoundRepository
 
 import { MIN_BATTLE_CHARACTERS } from '../../shared/constants/battlefield';
 import { validatorDto } from '../../shared/validators/validatorDTO';
-import { BattleStatus } from '../../shared/enums/Battle';
+import { BattleStatus, RoundType } from '../../shared/enums/Battle';
 import { PerformBattleDTO } from './PerformBattleDTO';
 import { Character } from '../../entities/Character';
 import { PerformRoundDTO } from './PerformRoundDTO';
@@ -19,14 +19,10 @@ import { isUUID } from 'class-validator';
 import {
   IMethodCalculate,
   IBattleState,
-  IRoundState,
 } from '../../shared/interfaces/IPerformBattle';
 
-import {
-  RoundFastestPlayerSelected,
-  RoundAttackPerformed,
-  RoundFinishedBattle,
-} from '../../shared/templates/BattleLog';
+import { IRoundState } from '../../shared/interfaces/IPerformRound';
+import { CharacterStatus } from '../../shared/enums/Character';
 
 export default class PerformBattleUseCase {
   constructor(
@@ -71,23 +67,27 @@ export default class PerformBattleUseCase {
     if (battle) {
       const [fastestPlayer, secondPlayer] = this.sortFasterPlayer(battle);
 
-      battle.setStatus = BattleStatus.Active;
       battle.setStarterPlayer = fastestPlayer.id;
+      const offensive = fastestPlayer.id;
+      const defensive = secondPlayer.id;
 
-      // const round = new Round(
-      //   battle.getId,
-      //   fastestPlayer.id,
-      //   secondPlayer.id,
-      //   'initial',
-      //   calculatedSpeed
-      // );
+      const initialRound = new Round(
+        battleId,
+        offensive,
+        defensive,
+        RoundType.Initial
+      );
+
+      const battleState = { battle, round: initialRound };
+      this.checkBattleState(battleState, offensive, defensive);
+
+      battle.setStatus = BattleStatus.Active;
+      await this.roundRepository.save(initialRound);
 
       await this.battleRepository.update(battle.getId, {
         starterPlayer: battle.getStarterPlayer,
         status: battle.getStatus,
       });
-
-      // await this.roundRepository.save(round);
 
       return battle;
     } else {
@@ -129,7 +129,7 @@ export default class PerformBattleUseCase {
     const remainingLife = battle.executeDamage(calculatedAttack, defensive);
 
     // TODO: review log infos
-    console.log(RoundAttackPerformed);
+    // console.log(RoundAttackPerformed);
 
     const executedDamage: IMethodCalculate = {
       id: defensive,
@@ -150,7 +150,15 @@ export default class PerformBattleUseCase {
 
   checkBattleState(state: IBattleState, offensive: string, defensive: string) {
     const { battle, round: lastRound } = state;
-    const totalOfRounds = battle.getRounds.length;
+
+    const executedRounds = battle.getRounds!.filter(
+      (r) => r.type !== RoundType.Initial
+    );
+
+    const totalOfRounds = executedRounds.length;
+    const lastRoundType = lastRound?.getType;
+    const isInitialRound = lastRoundType === RoundType.Initial;
+    const isActiveBattle = battle.getStatus === BattleStatus.Active;
 
     if (!battle.getStarterPlayer) {
       throw new UnprocessableException(
@@ -158,17 +166,21 @@ export default class PerformBattleUseCase {
       );
     }
 
+    if (isInitialRound && isActiveBattle) {
+      throw new UnprocessableException('The battle is already active');
+    }
+
     if (totalOfRounds > 0 && !lastRound) {
-      throw new UnprocessableException(`The last round was not found`);
+      throw new NotFoundException(`The last round was not found`);
     }
 
     if (battle.getStarterPlayer !== offensive && totalOfRounds === 0) {
       throw new UnprocessableException(
-        `This turn is offensive for ${defensive} player`
+        `This initial turn is offensive for ${defensive} player`
       );
     }
 
-    if (lastRound?.getOffensive === offensive) {
+    if (lastRound?.getOffensive === offensive && totalOfRounds > 0) {
       throw new UnprocessableException(
         `This turn is defensive for ${offensive} player`
       );
@@ -177,19 +189,23 @@ export default class PerformBattleUseCase {
 
   async setBattleState(battleState: IBattleState, roundState: IRoundState) {
     const { battle, round } = battleState;
+    const currentRound = { id: round.getId, type: round.getType! };
     const { calculatedAttack, calculatedDamage, executedDamage } = roundState;
 
-    battle.setRounds = round.getId;
+    battle.setRounds = currentRound;
     round.setCalculatedAttack = calculatedAttack;
     round.setCalculatedDamage = calculatedDamage;
 
+    await this.roundRepository.save(round);
+
     if (executedDamage.calculated <= 0) {
-      // TODO: review log infos
-      console.log(RoundFinishedBattle);
       await this.endBattleState(battle);
+      await this.endBattlePlayersState(battle.getPlayers);
+
+      console.log({ endBattle: battle });
     }
 
-    await this.roundRepository.save(round);
+    console.log({ battle });
     await this.battleRepository.update(battle.getId, {
       rounds: battle.getRounds,
       status: battle.getStatus,
@@ -198,10 +214,20 @@ export default class PerformBattleUseCase {
   }
 
   async endBattleState(battle: Battle) {
-    battle.setStatus = BattleStatus.Finished;
+    const battlePlayers = battle.getPlayers;
+    const winner = battlePlayers.find(
+      (p) => p.getStatus === CharacterStatus.Alive
+    );
 
-    for (const index in battle.getPlayers) {
-      const player = battle.getPlayers[index];
+    if (winner) {
+      battle.setWinnerPlayer = winner.getId;
+      battle.setStatus = BattleStatus.Finished;
+    }
+  }
+
+  async endBattlePlayersState(players: Character[]) {
+    for (const index in players) {
+      const player = players[index];
       const currentLife = player?.getLife;
 
       const updateParams = {
@@ -217,14 +243,18 @@ export default class PerformBattleUseCase {
   }
 
   async getBattleLog(battleId: string) {
-    return this.roundRepository.find({ battleId });
+    const rounds = await this.roundRepository.find({ battleId });
+    const battle = await this.battleRepository.findById(battleId);
+
+    return { rounds, battle };
   }
 
   async getLastMove(battle: Battle): Promise<Round | undefined> {
     const rounds = battle.getRounds.length - 1;
-    const lastRoundId = battle.getRounds[rounds];
+    const lastRound = battle.getRounds[rounds];
 
-    if (lastRoundId) {
+    if (lastRound) {
+      const lastRoundId = lastRound.id;
       return this.roundRepository.findById(lastRoundId);
     }
   }

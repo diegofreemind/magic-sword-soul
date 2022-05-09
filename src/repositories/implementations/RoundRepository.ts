@@ -1,7 +1,7 @@
 import {
   IRoundQuery,
   IRoundUpdate,
-} from '../../shared/interfaces/IPerformBattle';
+} from '../../shared/interfaces/IPerformRound';
 
 import Round from '../../entities/Round';
 import { Repository } from './Repository';

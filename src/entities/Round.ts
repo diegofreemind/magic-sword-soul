@@ -1,3 +1,4 @@
+import { RoundType } from '../shared/enums/Battle';
 import { BaseEntity } from './BaseEntity';
 
 export default class Round extends BaseEntity {
@@ -5,6 +6,7 @@ export default class Round extends BaseEntity {
     private battleId: string,
     private offensive: string,
     private defensive: string,
+    private type?: RoundType,
     private timestamp?: string,
     id?: string,
     private calculatedSpeed?: number,
@@ -24,6 +26,14 @@ export default class Round extends BaseEntity {
 
   get getOffensive() {
     return this.offensive;
+  }
+
+  get getType() {
+    return this.type;
+  }
+
+  set setType(type: RoundType) {
+    this.type = type;
   }
 
   get getDefensive() {

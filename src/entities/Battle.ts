@@ -1,15 +1,18 @@
 import { Character } from './Character';
-import { CharacterStatus } from '../shared/enums/Character';
-import { ActionType, BattleStatus } from '../shared/enums/Battle';
 import { BaseEntity } from './BaseEntity';
+
+import { CharacterStatus } from '../shared/enums/Character';
 import { IBattle } from '../shared/interfaces/IPerformBattle';
+import { ActionType, BattleStatus } from '../shared/enums/Battle';
+import { IRoundSummary } from '../shared/interfaces/IPerformRound';
 
 export default class Battle extends BaseEntity implements IBattle {
   constructor(
     public players: Character[],
     public playersQuantity: number,
     id?: string,
-    public rounds: string[] = [],
+    public rounds: IRoundSummary[] = [],
+    public winnerPlayer?: string,
     public starterPlayer?: string,
     public status?: BattleStatus
   ) {
@@ -29,6 +32,14 @@ export default class Battle extends BaseEntity implements IBattle {
     this.players = players;
   }
 
+  set setWinnerPlayer(winnerPlayer: string) {
+    this.winnerPlayer = winnerPlayer;
+  }
+
+  get getWinnerPlayer() {
+    return this.winnerPlayer;
+  }
+
   get getStatus() {
     return this.status;
   }
@@ -41,7 +52,7 @@ export default class Battle extends BaseEntity implements IBattle {
     return this.rounds;
   }
 
-  set setRounds(round: string) {
+  set setRounds(round: IRoundSummary) {
     this.rounds!.push(round);
   }
 

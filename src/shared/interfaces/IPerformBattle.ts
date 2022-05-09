@@ -1,5 +1,7 @@
 import { Character } from '../../entities/Character';
 import { BattleStatus } from '../enums/Battle';
+import { IRoundSummary } from './IPerformRound';
+
 import Battle from '../../entities/Battle';
 import Round from '../../entities/Round';
 
@@ -7,20 +9,10 @@ export interface IUpdate {
   [key: string]: any;
 }
 
-export interface IRoundLog {
-  offensive?: string;
-  defensive: string;
-  winner?: string;
-  calculatedAttack?: number;
-  calculatedDamage?: number;
-  defensiveCalculatedSpeed?: number;
-  offensiveCalculatedSpeed?: number;
-}
-
 export interface IBattle {
   players: Character[];
   playersQuantity: number;
-  rounds?: string[];
+  rounds?: IRoundSummary[];
   starterPlayer?: string;
 }
 
@@ -33,7 +25,7 @@ export interface IBattleQuery {
 }
 
 export interface IBattleUpdate {
-  rounds?: string[];
+  rounds?: IRoundSummary[];
   status?: BattleStatus;
   players?: Character[];
   starterPlayer?: string;
@@ -43,31 +35,6 @@ export interface IBattleUpdate {
 export interface IBattleState {
   battle: Battle;
   round: Round;
-}
-
-export interface IRoundQuery {
-  readonly id?: string;
-  readonly battleId?: string;
-  timestamp?: Date;
-  offensive?: string;
-  defensive?: string;
-  calculatedAttack?: number;
-  calculatedSpeed?: number;
-  calculatedDamage?: number;
-}
-
-export interface IRoundUpdate {
-  offensive?: string;
-  defensive?: string;
-  calculatedAttack?: number;
-  calculatedSpeed?: number;
-  calculatedDamage?: number;
-}
-
-export interface IRoundState {
-  calculatedAttack: number;
-  calculatedDamage: number;
-  executedDamage: IMethodCalculate;
 }
 
 export interface IMethodCalculate {

@@ -1,4 +1,4 @@
-import { IRoundLog } from '../interfaces/IPerformBattle';
+import { IRoundLog } from '../interfaces/IPerformRound';
 
 export const RoundFastestPlayerSelected = (params: IRoundLog) =>
   `${params.offensive} (${params.offensiveCalculatedSpeed}) foi mais veloz que

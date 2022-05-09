@@ -3,7 +3,7 @@ import { IRepository } from './../interfaces/IRepository';
 import {
   IRoundQuery,
   IRoundUpdate,
-} from '../../shared/interfaces/IPerformBattle';
+} from '../../shared/interfaces/IPerformRound';
 
 export interface IRoundRepository
   extends IRepository<Round, IRoundQuery, IRoundUpdate> {}
