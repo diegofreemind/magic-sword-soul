@@ -8,6 +8,8 @@
   "scripts": {
     "test": "jest",
     "build": "tsc",
+    "test:unit": "jest test/unit",
+    "test:integration": "jest test/integration",
     "start": "tsnd --transpile-only --respawn --ignore-watch node_modules src/server.ts"
   },
   "jest": {

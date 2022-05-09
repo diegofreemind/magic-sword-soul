@@ -1,8 +1,8 @@
-import Battle from '../../src/entities/Battle';
-import { BattleStatus } from '../../src/shared/enums/Battle';
-import { aliveCharacters } from '../__stubs__/PerformBattle';
-import { MIN_BATTLE_CHARACTERS } from '../../src/shared/constants/battlefield';
-import BattleRepository from '../../src/repositories/implementations/BattleRepository';
+import Battle from '../../../src/entities/Battle';
+import { BattleStatus } from '../../../src/shared/enums/Battle';
+import { getAliveCharacters } from '../../__stubs__/PerformBattle';
+import { MIN_BATTLE_CHARACTERS } from '../../../src/shared/constants/battlefield';
+import BattleRepository from '../../../src/repositories/implementations/BattleRepository';
 
 let repository: BattleRepository;
 
@@ -19,7 +19,7 @@ describe('BattleRepository:', () => {
       playerFour,
       playerFive,
       playerSix,
-    ] = aliveCharacters;
+    ] = getAliveCharacters();
 
     const battleOne = new Battle([playerOne, playerTwo], MIN_BATTLE_CHARACTERS);
 
@@ -56,7 +56,7 @@ describe('BattleRepository:', () => {
   });
 
   test('findById', async () => {
-    const [playerOne, playerTwo] = aliveCharacters;
+    const [playerOne, playerTwo] = getAliveCharacters();
 
     const battleOne = new Battle([playerOne, playerTwo], MIN_BATTLE_CHARACTERS);
 

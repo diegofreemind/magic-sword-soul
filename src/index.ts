@@ -23,12 +23,13 @@ const app: Application = express();
 
 // TODO: include helmet
 app.use(express.json());
-app.use(errorMiddleware);
 
 app.use('/', performBattleRouter);
 app.use('/', performRoundRouter);
 app.use('/', findCharacterRouter);
 app.use('/', listCharacterRouter);
 app.use('/', createCharacterRouter);
+
+app.use(errorMiddleware);
 
 export default app;

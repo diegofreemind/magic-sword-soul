@@ -21,6 +21,7 @@ import {
   IBattleState,
   IRoundState,
 } from '../../shared/interfaces/IPerformBattle';
+import { CharacterStatus } from '../../shared/enums/Character';
 
 export default class PerformBattleUseCase {
   constructor(
@@ -48,7 +49,7 @@ export default class PerformBattleUseCase {
       return battle;
     } catch (error) {
       throw new BadRequestException(
-        `Could not create the battle for ${Object.values(props)}`
+        `Could not create the battle for ${Object.values(props)} \n ${error}`
       );
     }
   }
@@ -144,20 +145,7 @@ export default class PerformBattleUseCase {
     round.setCalculatedDamage = calculatedDamage;
 
     if (executedDamage.calculated <= 0) {
-      battle.setStatus = BattleStatus.Finished;
-
-      const damagedPlayer = battle.getPlayers.find(
-        (player) => player.getId === executedDamage.id
-      );
-
-      const updateParams = {
-        life: damagedPlayer?.getLife,
-      };
-
-      await this.characterUseCase.updateCharacterById(
-        executedDamage.id,
-        updateParams
-      );
+      await this.endBattleState(battle);
     }
 
     await this.roundRepository.save(round);
@@ -166,6 +154,25 @@ export default class PerformBattleUseCase {
       status: battle.getStatus,
       players: battle.getPlayers,
     });
+  }
+
+  async endBattleState(battle: Battle) {
+    battle.setStatus = BattleStatus.Finished;
+
+    for (const index in battle.getPlayers) {
+      const player = battle.getPlayers[index];
+      const currentLife = player?.getLife;
+
+      const updateParams = {
+        life: currentLife > 0 ? currentLife : 0,
+        status: player.getStatus,
+      };
+
+      await this.characterUseCase.updateCharacterById(
+        player.getId,
+        updateParams
+      );
+    }
   }
 
   async getLastMove(battle: Battle): Promise<Round | undefined> {

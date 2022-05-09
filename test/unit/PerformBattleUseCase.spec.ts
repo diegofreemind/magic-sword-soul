@@ -5,7 +5,7 @@ import { NotFoundException } from '../../src/shared/exceptions/NotFoundException
 import PerformBattleUseCase from '../../src/useCases/PerformBattle/PerformBattleUseCase';
 import { PerformRoundDTO } from '../../src/useCases/PerformBattle/PerformRoundDTO';
 
-import { aliveCharacters, battleStub } from '../__stubs__/PerformBattle';
+import { getAliveCharacters, battleStub } from '../__stubs__/PerformBattle';
 import { CharacterUseCaseFake } from '../__mocks__/CharacterUseCaseFake';
 import { BattleRepositoryFake } from '../__mocks__/BattleRepositoryFake';
 import { RoundRepositoryFake } from '../__mocks__/RoundRepositoryFake';
@@ -17,6 +17,7 @@ import {
 
 import { BattleStatus } from '../../src/shared/enums/Battle';
 import Round from '../../src/entities/Round';
+import { CharacterStatus } from '../../src/shared/enums/Character';
 
 const characterUseCaseFake = new CharacterUseCaseFake();
 const battleRepositoryFake = new BattleRepositoryFake();
@@ -35,7 +36,7 @@ beforeEach(async () => {
 describe('F4 - Realizar o combate entre dois personagens', () => {
   describe('Deve inicializar uma batalha', () => {
     test('Deve criar uma nova batalha', async () => {
-      const [playerOne, playerTwo] = aliveCharacters;
+      const [playerOne, playerTwo] = getAliveCharacters();
 
       const currentBattle = await battleStub(sut, battleRepositoryFake, [
         playerOne,
@@ -77,7 +78,7 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
     });
 
     test('Deve abrir uma batalha existente', async () => {
-      const [playerOne, playerTwo] = aliveCharacters;
+      const [playerOne, playerTwo] = getAliveCharacters();
 
       const currentBattle = await battleStub(sut, battleRepositoryFake, [
         playerOne,
@@ -116,7 +117,7 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
     });
 
     test('Deve definir qual personagem inicializará a batalha', async () => {
-      const [playerOne, playerTwo] = aliveCharacters;
+      const [playerOne, playerTwo] = getAliveCharacters();
 
       const currentBattle = await battleStub(sut, battleRepositoryFake, [
         playerOne,
@@ -136,7 +137,7 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
     });
 
     test('Deve recalcular as velocidades de personagens no caso de empate', async () => {
-      const [playerOne, playerTwo] = aliveCharacters;
+      const [playerOne, playerTwo] = getAliveCharacters();
 
       const currentBattle = await battleStub(sut, battleRepositoryFake, [
         playerOne,
@@ -162,11 +163,13 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
       expect(battleRepoSpy).toHaveBeenCalledTimes(1);
       expect(startedBattle.getStarterPlayer).toBeDefined();
     });
+
+    test('Deve retornar um erro ao inicializar com o personagem incorreto', async () => {});
   });
 
   describe('Deve conduzir uma batalha', () => {
     test('Deve executar um turno batalha', async () => {
-      const [playerOne, playerTwo] = aliveCharacters;
+      const [playerOne, playerTwo] = getAliveCharacters();
 
       const currentBattle = await battleStub(
         sut,
@@ -225,7 +228,7 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
 
     describe('Deve garantir a ordem das jogadas com base na velocidade_calculada inicial', () => {
       test('Deve retornar o turno de batalha mais recente', async () => {
-        const [playerOne, playerTwo] = aliveCharacters;
+        const [playerOne, playerTwo] = getAliveCharacters();
 
         const currentBattle = await battleStub(sut, battleRepositoryFake, [
           playerOne,
@@ -263,7 +266,7 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
       });
 
       test('Deve retornar um erro ao executar um turno fora da ordem esperada', async () => {
-        const [playerOne, playerTwo] = aliveCharacters;
+        const [playerOne, playerTwo] = getAliveCharacters();
 
         const currentBattle = await battleStub(sut, battleRepositoryFake, [
           playerOne,
@@ -305,7 +308,7 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
       });
 
       test('Deve retornar um erro ao executar um turno em uma batalha não inicializada', async () => {
-        const [playerOne, playerTwo] = aliveCharacters;
+        const [playerOne, playerTwo] = getAliveCharacters();
 
         const currentBattle = await battleStub(sut, battleRepositoryFake, [
           playerOne,
@@ -335,7 +338,7 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
     });
 
     test('Deve subtrair os pontos de vida de um personagem após o dano ser realizado', async () => {
-      const [defensivePlayer, offensivePlayer] = aliveCharacters;
+      const [defensivePlayer, offensivePlayer] = getAliveCharacters();
 
       const currentBattle = await battleStub(sut, battleRepositoryFake, [
         defensivePlayer,
@@ -360,7 +363,7 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
 
   describe('Deve finalizar uma batalha', () => {
     test('Deve identificar a morte de um personagem', async () => {
-      const [defensivePlayer, offensivePlayer] = aliveCharacters;
+      const [defensivePlayer, offensivePlayer] = getAliveCharacters();
 
       const currentBattle = await battleStub(
         sut,
@@ -410,13 +413,13 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
 
       expect(executeDamageSpy).toBeCalledTimes(1);
 
-      console.log({ damagedPlayer });
-      expect(damagedPlayer!.getLife).toBeLessThanOrEqual(0);
+      expect(damagedPlayer!.getLife).toBeLessThan(0);
+      expect(damagedPlayer!.getStatus).toBe(CharacterStatus.Dead);
       expect(currentBattle.getStatus).toBe(BattleStatus.Finished);
     });
 
-    test('Cross Repo: Deve atualizar os pontos de vida de um personagem ao concluir', async () => {
-      const [defensivePlayer, offensivePlayer] = aliveCharacters;
+    test('Deve atualizar os pontos de vida de um personagem ao concluir', async () => {
+      const [defensivePlayer, offensivePlayer] = getAliveCharacters();
 
       const currentBattle = await battleStub(
         sut,
@@ -441,7 +444,7 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
         .mockResolvedValueOnce(Promise.resolve());
 
       const roundState: IRoundState = {
-        calculatedAttack: 2,
+        calculatedAttack: 100,
         calculatedDamage: defensivePlayer.getLife - 100,
         executedDamage: {
           id: defensivePlayer.getId,
@@ -456,22 +459,16 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
 
       const characterRepoSpy = jest
         .spyOn(characterUseCaseFake, 'updateCharacterById')
-        .mockResolvedValueOnce(Promise.resolve());
+        .mockResolvedValue(Promise.resolve());
 
+      defensivePlayer.setStatus = CharacterStatus.Dead;
       const sutSpy = jest.spyOn(sut, 'setBattleState');
       await sut.setBattleState(battleState, roundState);
 
       expect(sutSpy).toHaveBeenCalledTimes(1);
-      expect(characterRepoSpy).toHaveBeenCalledWith(defensivePlayer.getId, {
-        life: defensivePlayer?.getLife,
-      });
-
+      expect(characterRepoSpy).toHaveBeenCalledTimes(2);
       expect(currentBattle.getStatus).toBe(BattleStatus.Finished);
       expect(sutSpy).toHaveBeenCalledWith(battleState, roundState);
     });
-
-    test('Repo -> LOG: Não devem ser persistidos os eventos de empate de velocidade', () => {});
-    test('Repo -> LOG: Deve informar qual personagem venceu e qual personagem morreu', () => {});
-    test('Repo -> LOG: Deve apresentar o conjunto de turnos da batalha', () => {});
   });
 });

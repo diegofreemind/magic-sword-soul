@@ -27,6 +27,10 @@ export abstract class Character extends BaseEntity {
     return this.status;
   }
 
+  set setStatus(status: CharacterStatus) {
+    this.status = status;
+  }
+
   get getLife() {
     return this.life;
   }

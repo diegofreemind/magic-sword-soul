@@ -1,6 +1,6 @@
-import { Character } from '../../src/entities/Character';
-import { CharacterFactoryStub } from '../__stubs__/CharacterFactoryStub';
-import CharacterRepository from '../../src/repositories/implementations/CharacterRepository';
+import { Character } from '../../../src/entities/Character';
+import { CharacterFactoryStub } from '../../__stubs__/CharacterFactoryStub';
+import CharacterRepository from '../../../src/repositories/implementations/CharacterRepository';
 
 let repository: CharacterRepository;
 const characterFactoryStub = new CharacterFactoryStub(10);

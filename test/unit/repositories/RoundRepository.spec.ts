@@ -1,9 +1,9 @@
-import Battle from '../../src/entities/Battle';
-import Round from '../../src/entities/Round';
+import Battle from '../../../src/entities/Battle';
+import Round from '../../../src/entities/Round';
 
-import { aliveCharacters } from '../__stubs__/PerformBattle';
-import { MIN_BATTLE_CHARACTERS } from '../../src/shared/constants/battlefield';
-import RoundRepository from '../../src/repositories/implementations/RoundRepository';
+import { getAliveCharacters } from '../../__stubs__/PerformBattle';
+import { MIN_BATTLE_CHARACTERS } from '../../../src/shared/constants/battlefield';
+import RoundRepository from '../../../src/repositories/implementations/RoundRepository';
 
 let repository: RoundRepository;
 
@@ -13,7 +13,7 @@ beforeEach(() => {
 
 describe('RoundRepository:', () => {
   test('save', async () => {
-    const [playerOne, playerTwo] = aliveCharacters;
+    const [playerOne, playerTwo] = getAliveCharacters();
 
     const battleOne = new Battle([playerOne, playerTwo], MIN_BATTLE_CHARACTERS);
 
@@ -32,7 +32,7 @@ describe('RoundRepository:', () => {
   });
 
   test('findById', async () => {
-    const [playerOne, playerTwo] = aliveCharacters;
+    const [playerOne, playerTwo] = getAliveCharacters();
 
     const battleOne = new Battle([playerOne, playerTwo], MIN_BATTLE_CHARACTERS);
 

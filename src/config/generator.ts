@@ -42,6 +42,6 @@ export async function generateCharacters(quantity: number) {
     await characterRepository.save(p);
   }
 
-  const generated = await characterRepository.find({});
-  console.log('Available Characters: \n', generated);
+  // const generated = await characterRepository.find({});
+  // console.log('Available Characters: \n', generated);
 }

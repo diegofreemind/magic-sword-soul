@@ -10,7 +10,6 @@ export default class FindCharacterUseCase {
     if (isUUID(id)) {
       const foundCharacter = await this.characterRepository.findById(id);
 
-      console.log({ useCase: foundCharacter });
       if (foundCharacter) {
         return foundCharacter;
       }

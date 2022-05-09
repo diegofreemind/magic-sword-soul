@@ -60,6 +60,11 @@ export default class Battle extends BaseEntity implements IBattle {
 
     if (targetPlayer) {
       targetPlayer.setLife = targetPlayer.getLife - calculatedAttack;
+
+      if (targetPlayer.getLife <= 0) {
+        targetPlayer.setStatus = CharacterStatus.Dead;
+      }
+
       return targetPlayer.getLife;
     }
 

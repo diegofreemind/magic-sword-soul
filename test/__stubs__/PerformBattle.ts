@@ -8,10 +8,11 @@ import PerformBattleUseCase from '../../src/useCases/PerformBattle/PerformBattle
 
 const characterUseCaseFake = new CharacterUseCaseFake();
 
-export const aliveCharacters: Character[] =
-  characterUseCaseFake.InMemoryCharacters.filter(
+export const getAliveCharacters = (): Character[] => {
+  return characterUseCaseFake.InMemoryCharacters.filter(
     (character) => character.getStatus === CharacterStatus.Alive
   );
+};
 
 export const battleStub = async (
   sut: PerformBattleUseCase,

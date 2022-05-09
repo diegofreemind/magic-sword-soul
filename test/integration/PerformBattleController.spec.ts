@@ -1,48 +1,63 @@
 import request from 'supertest';
 import app from '../../src/index';
-import { aliveCharacters } from '../__stubs__/PerformBattle';
+import { CharacterStatus } from '../../src/shared/enums/Character';
+import { CharacterFactoryStub } from '../__stubs__/CharacterFactoryStub';
 
-describe.only('POST /battle', () => {
-  test.only('Deve retornar o status code 201 ao informar os dados corretos', async () => {
-    const [playerOne, playerTwo] = aliveCharacters;
+const InMemoryCharacters: CharacterFactoryStub = new CharacterFactoryStub(20);
 
-    const result = await request(app)
-      .post('/battle')
-      .send({
-        players: [playerOne.getId, playerTwo.getId],
+const aliveCharacters = InMemoryCharacters.collection.filter(
+  (character) => character.getStatus === CharacterStatus.Alive
+);
+
+describe('Execução de uma batalha', () => {
+  describe.only('POST /battle', () => {
+    test('Deve retornar o status code 201 ao informar os dados corretos', async () => {
+      const [characterOne, characterTwo] = aliveCharacters;
+
+      const responseOne = await request(app).post('/character').send({
+        name: characterOne.getName,
+        profession: 'warrior',
       });
 
-    console.log(result);
+      const responseTwo = await request(app).post('/character').send({
+        name: characterTwo.getName,
+        profession: 'thief',
+      });
 
-    expect(result.statusCode).toEqual(201);
-    expect(result.body).toHaveProperty('id');
-    expect(result.body).toMatchObject(
-      expect.objectContaining({
-        life: 20,
-        skill: 5,
-        strength: 10,
-        intelligence: 5,
+      expect(responseOne.body).toHaveProperty('id');
+      const playerOne = responseOne.body;
+
+      expect(responseTwo.body).toHaveProperty('id');
+      const playerTwo = responseTwo.body;
+
+      const result = await request(app)
+        .post('/battle')
+        .send({
+          players: [playerOne.id, playerTwo.id],
+        });
+
+      expect(result.statusCode).toEqual(201);
+      expect(result.body).toHaveProperty('id');
+      expect(result.body).toHaveProperty('status');
+      expect(result.body).toHaveProperty('players');
+    });
+
+    test('Deve retornar o status code 400 ao informar os dados incorretos', async () => {
+      const result = await request(app).post('/battle').send({
         name: 'Gusnmg_Hujn',
-        profession: 'warrior',
-      })
-    );
-  });
+        profession: 'witcher',
+      });
 
-  test('Deve retornar o status code 400 ao informar os dados incorretos', async () => {
-    const result = await request(app).post('/battle').send({
-      name: 'Gusnmg_Hujn',
-      profession: 'witcher',
+      expect(result.statusCode).toEqual(400);
     });
 
-    expect(result.statusCode).toEqual(400);
-  });
+    test('Deve retornar o status code 404 ao informar o endereço incorreto', async () => {
+      const result = await request(app).post('/').send({
+        name: 'Gusnmg_Hujn',
+        profession: 'witcher',
+      });
 
-  test('Deve retornar o status code 404 ao informar o endereço incorreto', async () => {
-    const result = await request(app).post('/').send({
-      name: 'Gusnmg_Hujn',
-      profession: 'witcher',
+      expect(result.statusCode).toEqual(404);
     });
-
-    expect(result.statusCode).toEqual(404);
   });
 });

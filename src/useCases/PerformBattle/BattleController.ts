@@ -16,7 +16,7 @@ export default class PerformBattleController {
       const props = request.body;
       const battle = await this.performBattleUseCase.createBattle(props);
 
-      return response.status(HTTP_SUCCESS_CODE).send(battle);
+      return response.status(HTTP_CREATED_CODE).send(battle);
     } catch (error: any) {
       next(error);
     }
@@ -31,7 +31,7 @@ export default class PerformBattleController {
       const battleId = request.params.id;
       const battle = await this.performBattleUseCase.executeBattle(battleId);
 
-      return response.status(HTTP_CREATED_CODE).send(battle);
+      return response.status(HTTP_SUCCESS_CODE).send(battle);
     } catch (error: any) {
       next(error);
     }

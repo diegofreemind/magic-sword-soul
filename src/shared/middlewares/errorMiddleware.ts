@@ -9,6 +9,7 @@ export const errorMiddleware = (
 ) => {
   const status = error.status || 500;
   const message = error.message || 'Internal server error';
+
   response.status(status).send({
     status,
     message,
