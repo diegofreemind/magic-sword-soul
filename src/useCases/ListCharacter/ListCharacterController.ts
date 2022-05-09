@@ -10,9 +10,21 @@ export default class ListCharacterController {
     next: NextFunction
   ): Promise<Response | void> {
     try {
-      // TODO: decouple pagination
-      const props = request.query;
-      const characters = await this.listCharacterUseCase.execute(props);
+      const { query } = request;
+      const { pageNumber, pageSize } = query;
+
+      const parsedLimitSize = {
+        pageNumber: Number(pageNumber),
+        pageSize: Number(pageSize),
+      };
+
+      const props = (({ pageSize, pageNumber, ...params }) => params)(query);
+      const pagination = pageNumber && pageSize ? parsedLimitSize : undefined;
+
+      const characters = await this.listCharacterUseCase.execute(
+        props,
+        pagination
+      );
 
       return response.status(HTTP_SUCCESS_CODE).send(characters);
     } catch (error: any) {

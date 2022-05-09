@@ -9,6 +9,10 @@ import { validatorDto } from '../../shared/validators/validatorDTO';
 export default class ListCharacterUseCase {
   constructor(private characterRepository: ICharacterRepository) {}
   async execute(query: ListCharacterDTO, pagination?: Pagination) {
+    if (pagination) {
+      await validatorDto(Pagination, pagination);
+    }
+
     if (isNotEmptyObject(query)) {
       await validatorDto(ListCharacterDTO, query);
     }

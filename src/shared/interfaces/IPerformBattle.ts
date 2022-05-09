@@ -7,6 +7,16 @@ export interface IUpdate {
   [key: string]: any;
 }
 
+export interface IRoundLog {
+  offensive?: string;
+  defensive: string;
+  winner?: string;
+  calculatedAttack?: number;
+  calculatedDamage?: number;
+  defensiveCalculatedSpeed?: number;
+  offensiveCalculatedSpeed?: number;
+}
+
 export interface IBattle {
   players: Character[];
   playersQuantity: number;

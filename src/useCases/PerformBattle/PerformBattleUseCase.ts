@@ -21,7 +21,12 @@ import {
   IBattleState,
   IRoundState,
 } from '../../shared/interfaces/IPerformBattle';
-import { CharacterStatus } from '../../shared/enums/Character';
+
+import {
+  RoundFastestPlayerSelected,
+  RoundAttackPerformed,
+  RoundFinishedBattle,
+} from '../../shared/templates/BattleLog';
 
 export default class PerformBattleUseCase {
   constructor(
@@ -64,15 +69,25 @@ export default class PerformBattleUseCase {
     const battle = await this.battleRepository.findById(battleId);
 
     if (battle) {
-      const fastestPlayer = this.sortFasterPlayer(battle);
+      const [fastestPlayer, secondPlayer] = this.sortFasterPlayer(battle);
 
       battle.setStatus = BattleStatus.Active;
       battle.setStarterPlayer = fastestPlayer.id;
+
+      // const round = new Round(
+      //   battle.getId,
+      //   fastestPlayer.id,
+      //   secondPlayer.id,
+      //   'initial',
+      //   calculatedSpeed
+      // );
 
       await this.battleRepository.update(battle.getId, {
         starterPlayer: battle.getStarterPlayer,
         status: battle.getStatus,
       });
+
+      // await this.roundRepository.save(round);
 
       return battle;
     } else {
@@ -104,9 +119,7 @@ export default class PerformBattleUseCase {
 
     this.checkBattleState({ battle, round: lastRound! }, offensive, defensive);
 
-    const timestamp = new Date().toISOString();
-    const round = new Round(battle.getId, timestamp, offensive, defensive);
-
+    const round = new Round(battle.getId, offensive, defensive);
     const calculatedAttack = battle.calculateAttack(offensive);
     const calculatedDamage = battle.calculateDamage(
       calculatedAttack,
@@ -114,6 +127,9 @@ export default class PerformBattleUseCase {
     );
 
     const remainingLife = battle.executeDamage(calculatedAttack, defensive);
+
+    // TODO: review log infos
+    console.log(RoundAttackPerformed);
 
     const executedDamage: IMethodCalculate = {
       id: defensive,
@@ -168,6 +184,8 @@ export default class PerformBattleUseCase {
     round.setCalculatedDamage = calculatedDamage;
 
     if (executedDamage.calculated <= 0) {
+      // TODO: review log infos
+      console.log(RoundFinishedBattle);
       await this.endBattleState(battle);
     }
 
@@ -198,6 +216,10 @@ export default class PerformBattleUseCase {
     }
   }
 
+  async getBattleLog(battleId: string) {
+    return this.roundRepository.find({ battleId });
+  }
+
   async getLastMove(battle: Battle): Promise<Round | undefined> {
     const rounds = battle.getRounds.length - 1;
     const lastRoundId = battle.getRounds[rounds];
@@ -207,7 +229,7 @@ export default class PerformBattleUseCase {
     }
   }
 
-  sortFasterPlayer(battle: Battle): IMethodCalculate {
+  sortFasterPlayer(battle: Battle): IMethodCalculate[] {
     const sorted = battle.getPlayers.map((player) => {
       return {
         id: player.getId,
@@ -230,7 +252,7 @@ export default class PerformBattleUseCase {
       return this.sortFasterPlayer(battle);
     }
 
-    const [fastestPlayer] = sortedByFasterPlayer.reverse();
-    return fastestPlayer;
+    const playersSpeed = sortedByFasterPlayer.reverse();
+    return playersSpeed;
   }
 }

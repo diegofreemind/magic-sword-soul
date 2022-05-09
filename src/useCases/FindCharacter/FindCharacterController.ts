@@ -11,7 +11,7 @@ export default class FindCharacterController {
   ): Promise<Response | void> {
     try {
       const props = request.params.id;
-      const character = await this.listCharacterUseCase.execute(props);
+      const character = await this.listCharacterUseCase.execute(props, true);
 
       return response.status(HTTP_SUCCESS_CODE).send(character);
     } catch (error: any) {

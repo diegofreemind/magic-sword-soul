@@ -31,6 +31,53 @@ describe('RoundRepository:', () => {
     expect(repoSaveSpy).toHaveReturnedTimes(1);
   });
 
+  test('find', async () => {
+    const [playerOne, playerTwo] = getAliveCharacters();
+
+    const battleOne = new Battle([playerOne, playerTwo], MIN_BATTLE_CHARACTERS);
+    const battleTwo = new Battle([playerOne, playerTwo], MIN_BATTLE_CHARACTERS);
+
+    const repoSaveSpy = jest.spyOn(repository, 'save');
+    const repoFindSpy = jest.spyOn(repository, 'find');
+
+    const anotherRound = new Round(
+      battleTwo.getId,
+      new Date().toISOString(),
+      playerOne.getId,
+      playerTwo.getId
+    );
+
+    const roundOne = new Round(
+      battleOne.getId,
+      new Date().toISOString(),
+      playerOne.getId,
+      playerTwo.getId
+    );
+
+    const roundTwo = new Round(
+      battleOne.getId,
+      new Date().toISOString(),
+      playerTwo.getId,
+      playerOne.getId
+    );
+
+    await repository.save(roundOne);
+    await repository.save(roundTwo);
+    await repository.save(anotherRound);
+
+    const rounds = await repository.find({
+      battleId: battleOne.getId,
+    });
+
+    console.log({ rounds });
+
+    expect(rounds).toBeDefined();
+    expect(rounds).toHaveLength(2);
+
+    expect(repoSaveSpy).toBeCalledTimes(3);
+    expect(repoFindSpy).toBeCalledTimes(1);
+  });
+
   test('findById', async () => {
     const [playerOne, playerTwo] = getAliveCharacters();
 

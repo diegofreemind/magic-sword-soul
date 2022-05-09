@@ -1,21 +1,11 @@
-// import { IsNumber, Min, IsOptional } from 'class-validator';
-// import { Type } from 'class-transformer';
+import { IsNumber, Min } from 'class-validator';
 
-export type Pagination = {
-  pageNumber: number;
-  pageSize: number;
-};
+export class Pagination {
+  @IsNumber()
+  @Min(0)
+  pageNumber!: number;
 
-// export class PaginationParams {
-//   @IsOptional()
-//   @Type(() => Number)
-//   @IsNumber()
-//   @Min(0)
-//   pageNumber?: number;
-
-//   @IsOptional()
-//   @Type(() => Number)
-//   @IsNumber()
-//   @Min(1)
-//   pageSize?: number;
-// }
+  @IsNumber()
+  @Min(1)
+  pageSize!: number;
+}

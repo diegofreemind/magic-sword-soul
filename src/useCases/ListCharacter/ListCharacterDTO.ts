@@ -13,8 +13,4 @@ export class ListCharacterDTO {
   @IsOptional()
   @IsString()
   readonly name?: string;
-
-  @IsOptional()
-  @IsUUID()
-  readonly id?: string;
 }

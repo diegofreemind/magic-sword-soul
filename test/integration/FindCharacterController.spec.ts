@@ -12,6 +12,7 @@ describe('Detalhes de personagem', () => {
       const result = await request(app).get('/character/' + preset.body.id);
 
       expect(result.statusCode).toEqual(200);
+      expect(result.body).toHaveProperty('labels');
       expect(result.body).toHaveProperty('character');
       expect(result.body?.character).toMatchObject(preset.body);
     });

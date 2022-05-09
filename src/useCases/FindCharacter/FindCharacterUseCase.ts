@@ -8,7 +8,10 @@ import { ICharacterMeta } from '../../shared/interfaces/ICharacter';
 
 export default class FindCharacterUseCase {
   constructor(private characterRepository: ICharacterRepository) {}
-  async execute(id: string): Promise<ICharacterMeta | Character | undefined> {
+  async execute(
+    id: string,
+    withLabels?: boolean
+  ): Promise<ICharacterMeta | Character | undefined> {
     if (isUUID(id)) {
       const foundCharacter = await this.characterRepository.findById(id);
 
@@ -16,7 +19,7 @@ export default class FindCharacterUseCase {
         const character = foundCharacter;
         const labels = foundCharacter?.labels();
 
-        return { character, labels };
+        return withLabels ? { character, labels } : character;
       }
 
       throw new NotFoundException(`The character ${id} was not found`);

@@ -15,8 +15,8 @@ import {
   IRoundState,
 } from '../../src/shared/interfaces/IPerformBattle';
 
-import { BattleStatus } from '../../src/shared/enums/Battle';
 import Round from '../../src/entities/Round';
+import { BattleStatus } from '../../src/shared/enums/Battle';
 import { CharacterStatus } from '../../src/shared/enums/Character';
 
 const characterUseCaseFake = new CharacterUseCaseFake();
@@ -126,7 +126,7 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
 
       jest.spyOn(currentBattle, 'calculateSpeed').mockReturnValueOnce(100);
 
-      const fastestPlayer = sut.sortFasterPlayer(currentBattle);
+      const [fastestPlayer] = sut.sortFasterPlayer(currentBattle);
 
       expect(fastestPlayer).toBeDefined();
       expect(fastestPlayer.id).toBe(currentBattle.getPlayers[0].getId);
