@@ -102,11 +102,7 @@ export default class PerformBattleUseCase {
   async runActiveBattle(battle: Battle, offensive: string, defensive: string) {
     const lastRound = await this.getLastMove(battle);
 
-    if (lastRound?.getOffensive === offensive) {
-      throw new UnprocessableException(
-        `This turn is defensive for ${offensive} player`
-      );
-    }
+    this.checkBattleState({ battle, round: lastRound! }, offensive, defensive);
 
     const timestamp = new Date().toISOString();
     const round = new Round(battle.getId, timestamp, offensive, defensive);
@@ -134,6 +130,33 @@ export default class PerformBattleUseCase {
     await this.setBattleState(battleState, roundState);
 
     return battleState;
+  }
+
+  checkBattleState(state: IBattleState, offensive: string, defensive: string) {
+    const { battle, round: lastRound } = state;
+    const totalOfRounds = battle.getRounds.length;
+
+    if (!battle.getStarterPlayer) {
+      throw new UnprocessableException(
+        `The starter player was not defined, please execute the Battle to initialize`
+      );
+    }
+
+    if (totalOfRounds > 0 && !lastRound) {
+      throw new UnprocessableException(`The last round was not found`);
+    }
+
+    if (battle.getStarterPlayer !== offensive && totalOfRounds === 0) {
+      throw new UnprocessableException(
+        `This turn is offensive for ${defensive} player`
+      );
+    }
+
+    if (lastRound?.getOffensive === offensive) {
+      throw new UnprocessableException(
+        `This turn is defensive for ${offensive} player`
+      );
+    }
   }
 
   async setBattleState(battleState: IBattleState, roundState: IRoundState) {

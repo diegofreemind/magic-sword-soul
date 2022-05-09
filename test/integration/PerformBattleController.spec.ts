@@ -1,26 +1,16 @@
 import request from 'supertest';
 import app from '../../src/index';
-import { CharacterStatus } from '../../src/shared/enums/Character';
-import { CharacterFactoryStub } from '../__stubs__/CharacterFactoryStub';
-
-const InMemoryCharacters: CharacterFactoryStub = new CharacterFactoryStub(20);
-
-const aliveCharacters = InMemoryCharacters.collection.filter(
-  (character) => character.getStatus === CharacterStatus.Alive
-);
 
 describe('Execução de uma batalha', () => {
   describe.only('POST /battle', () => {
     test('Deve retornar o status code 201 ao informar os dados corretos', async () => {
-      const [characterOne, characterTwo] = aliveCharacters;
-
       const responseOne = await request(app).post('/character').send({
-        name: characterOne.getName,
+        name: 'playerOne_name',
         profession: 'warrior',
       });
 
       const responseTwo = await request(app).post('/character').send({
-        name: characterTwo.getName,
+        name: 'playerTwo_name',
         profession: 'thief',
       });
 

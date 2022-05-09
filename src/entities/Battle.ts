@@ -105,7 +105,7 @@ export default class Battle extends BaseEntity implements IBattle {
     }
 
     const deadCharacter = this.players.find(
-      (player) => player.getStatus === CharacterStatus.Dead
+      (player) => player?.getStatus === CharacterStatus.Dead
     );
 
     if (deadCharacter) {

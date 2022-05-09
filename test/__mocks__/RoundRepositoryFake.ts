@@ -10,7 +10,7 @@ export class RoundRepositoryFake implements IRoundRepository {
   save(resource: Round): Promise<void> {
     throw new Error('Method not implemented.');
   }
-  findById(id: string): Promise<Round> {
+  findById(id: string): Promise<Round | undefined> {
     throw new Error('Method not implemented.');
   }
   update(id: string, params: IRoundUpdate): Promise<void> {

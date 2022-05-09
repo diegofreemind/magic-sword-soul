@@ -164,7 +164,46 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
       expect(startedBattle.getStarterPlayer).toBeDefined();
     });
 
-    test('Deve retornar um erro ao inicializar com o personagem incorreto', async () => {});
+    test('Deve retornar um erro ao inicializar com o personagem incorreto', async () => {
+      const [playerOne, playerTwo] = getAliveCharacters();
+
+      const currentBattle = await battleStub(
+        sut,
+        battleRepositoryFake,
+        [playerOne, playerTwo],
+        BattleStatus.Active
+      );
+
+      const props: PerformRoundDTO = {
+        offensive: playerTwo.getId,
+        defensive: playerOne.getId,
+        battleId: currentBattle!.getId,
+      };
+
+      expect(currentBattle.getRounds).toHaveLength(0);
+
+      const lastRound = new Round(
+        currentBattle.getId,
+        new Date().toISOString(),
+        playerOne.getId,
+        playerTwo.getId
+      );
+
+      currentBattle.setRounds = lastRound.getId;
+      currentBattle.setStarterPlayer = playerOne.getId;
+
+      jest
+        .spyOn(battleRepositoryFake, 'findById')
+        .mockResolvedValueOnce(Promise.resolve(currentBattle));
+
+      jest
+        .spyOn(roundRepositoryFake, 'findById')
+        .mockResolvedValueOnce(Promise.resolve(undefined));
+
+      await expect(sut.executeRound(props)).rejects.toBeInstanceOf(
+        UnprocessableException
+      );
+    });
   });
 
   describe('Deve conduzir uma batalha', () => {
@@ -206,7 +245,7 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
 
       jest
         .spyOn(characterUseCaseFake, 'updateCharacterById')
-        .mockResolvedValueOnce(Promise.resolve());
+        .mockResolvedValue(Promise.resolve());
 
       const battleRepoSpy = jest
         .spyOn(battleRepositoryFake, 'update')
@@ -372,6 +411,8 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
         BattleStatus.Active
       );
 
+      currentBattle.setStarterPlayer = offensivePlayer.getId;
+
       const props: PerformRoundDTO = {
         offensive: offensivePlayer.getId,
         defensive: defensivePlayer.getId,
@@ -392,7 +433,7 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
 
       jest
         .spyOn(characterUseCaseFake, 'updateCharacterById')
-        .mockResolvedValueOnce(Promise.resolve());
+        .mockResolvedValue(Promise.resolve());
 
       const calculatedAttackSpy = jest
         .spyOn(currentBattle, 'calculateAttack')
