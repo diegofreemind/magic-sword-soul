@@ -9,9 +9,12 @@ import { IRoundRepository } from '../../repositories/interfaces/IRoundRepository
 import { MIN_BATTLE_CHARACTERS } from '../../shared/constants/battlefield';
 import { validatorDto } from '../../shared/validators/validatorDTO';
 import { BattleStatus, RoundType } from '../../shared/enums/Battle';
+
 import { PerformBattleDTO } from './PerformBattleDTO';
 import { Character } from '../../entities/Character';
 import { PerformRoundDTO } from './PerformRoundDTO';
+
+import { logger } from '../../config/logging';
 import Battle from '../../entities/Battle';
 import Round from '../../entities/Round';
 import { isUUID } from 'class-validator';
@@ -55,6 +58,7 @@ export default class PerformBattleUseCase {
       await this.battleRepository.save(battle);
       return battle;
     } catch (error) {
+      logger.error(error);
       throw new BadRequestException(
         `Could not create the battle for ${Object.values(props)} \n ${error}`
       );
@@ -84,19 +88,25 @@ export default class PerformBattleUseCase {
         RoundType.Initial
       );
 
+      battle.setStatus = BattleStatus.Active;
       initialRound.setCalculatedSpeed = fastestPlayer;
       initialRound.setCalculatedSpeed = secondPlayer;
 
+      this.checkBattleState(
+        { battle, round: initialRound },
+        offensive,
+        defensive
+      );
+
+      const roundState: IRoundState = {
+        calculatedAttack: initialRound.getCalculatedAttack,
+        calculatedDamage: initialRound.getCalculatedDamage,
+        calculatedSpeed: initialRound.getCalculatedSpeed,
+        executedDamage: undefined,
+      };
+
       const battleState = { battle, round: initialRound };
-      this.checkBattleState(battleState, offensive, defensive);
-
-      battle.setStatus = BattleStatus.Active;
-      await this.roundRepository.save(initialRound);
-
-      await this.battleRepository.update(battle.getId, {
-        starterPlayer: battle.getStarterPlayer,
-        status: battle.getStatus,
-      });
+      await this.setBattleState(battleState, roundState);
 
       return battle;
     } else {
@@ -111,12 +121,15 @@ export default class PerformBattleUseCase {
 
     switch (battle?.getStatus) {
       case BattleStatus.Closed:
-        throw new UnprocessableException(`The battle ${battleId} is closed `);
+        logger.info(`The battle ${battleId} is closed`);
+        throw new UnprocessableException(`The battle ${battleId} is closed`);
       case BattleStatus.Active:
         return this.runActiveBattle(battle, offensive, defensive);
       case BattleStatus.Finished:
+        logger.info(`The battle ${battleId} is finished`);
         throw new UnprocessableException(`The battle ${battleId} is finished`);
       default:
+        logger.info(`Could not process the battle ${battleId}`);
         throw new UnprocessableException(
           `Could not process the battle ${battleId}`
         );
@@ -156,33 +169,46 @@ export default class PerformBattleUseCase {
 
   async setBattleState(battleState: IBattleState, roundState: IRoundState) {
     const { battle, round } = battleState;
-    const currentRound = { id: round.getId, type: round.getType! };
+    const battlePlayers = battle.getPlayers;
+
     const { calculatedAttack, calculatedDamage, executedDamage } = roundState;
+    const isFinalRound = executedDamage && executedDamage.calculated <= 0;
 
-    battle.setRounds = currentRound;
-    round.setCalculatedAttack = calculatedAttack;
-    round.setCalculatedDamage = calculatedDamage;
+    let updateRoundCollection: Round[] = [];
+    round.setCalculatedAttack = calculatedAttack!;
+    round.setCalculatedDamage = calculatedDamage!;
 
-    await this.roundRepository.save(round);
+    updateRoundCollection.push(round);
 
-    if (executedDamage.calculated <= 0) {
-      const battlePlayers = battle.getPlayers;
+    if (isFinalRound) {
       const winner = battlePlayers.find(
         (player) => player.getStatus === CharacterStatus.Alive
       );
 
-      if (winner) {
-        battle.setWinnerPlayer = winner.getId;
-        battle.setStatus = BattleStatus.Finished;
-      }
+      const offensive = round.getOffensive;
+      const defensive = round.getDefensive;
+      battle.setWinnerPlayer = winner!.getId;
+      battle.setStatus = BattleStatus.Finished;
 
-      await this.endBattlePlayersState(battle.getPlayers);
+      updateRoundCollection.push(
+        new Round(battle.getId, offensive, defensive, RoundType.Closing)
+      );
+
+      await this.endBattlePlayersState(battlePlayers);
     }
 
+    const updateAsPromise = updateRoundCollection.map(async (roundUpdate) => {
+      battle.setRounds = { id: roundUpdate.getId, type: roundUpdate.getType! };
+      await this.roundRepository.save(roundUpdate);
+    });
+
+    await Promise.all(updateAsPromise);
+
     await this.battleRepository.update(battle.getId, {
+      players: battlePlayers,
       rounds: battle.getRounds,
       status: battle.getStatus,
-      players: battle.getPlayers,
+      starterPlayer: battle.getStarterPlayer,
     });
   }
 
@@ -210,8 +236,8 @@ export default class PerformBattleUseCase {
       (r) => r.type !== RoundType.Initial
     );
 
-    const totalOfRounds = executedRounds.length;
     const lastRoundType = lastRound?.getType;
+    const totalOfRounds = executedRounds.length;
     const isInitialRound = lastRoundType === RoundType.Initial;
     const isActiveBattle = battle.getStatus === BattleStatus.Active;
 
@@ -221,8 +247,8 @@ export default class PerformBattleUseCase {
       );
     }
 
-    if (isInitialRound && isActiveBattle) {
-      throw new UnprocessableException('The battle is already active');
+    if (isInitialRound && !isActiveBattle) {
+      throw new UnprocessableException('The battle is not active');
     }
 
     if (totalOfRounds > 0 && !lastRound) {
@@ -245,9 +271,15 @@ export default class PerformBattleUseCase {
   async getBattleLog(battleId: string) {
     const { rounds, battle } = await this.getBattleResources(battleId);
 
+    if (!rounds || !battle) {
+      throw new BadRequestException(`Log not found for battle ${battleId}`);
+    }
+
     const initialRound = rounds.find((r) => r.getType === RoundType.Initial);
     const closingRound = rounds.find((r) => r.getType === RoundType.Closing);
     const onGoingRounds = rounds.filter((r) => r.getType === RoundType.OnGoing);
+
+    logger.debug({ initialRound, onGoingRounds, closingRound });
 
     const initialPlayersState = this.getDetailedPlayer(
       battle?.getPlayers!,
@@ -278,9 +310,7 @@ export default class PerformBattleUseCase {
       battleId,
       winner: finalRound.winnerPlayerName,
       summary: {
-        firstRound,
-        intermediateRounds,
-        finalRound,
+        rounds: [firstRound, intermediateRounds, finalRound],
       },
       text: [firstRound.message, ...messages, finalRound.message],
     };
@@ -302,7 +332,11 @@ export default class PerformBattleUseCase {
 
     return {
       message: roundFastestPlayerSelected,
-      metadata: { id: round?.getId, timestamp: round?.getTimestamp },
+      metadata: {
+        id: round?.getId,
+        timestamp: round?.getTimestamp,
+        type: round?.getType,
+      },
     };
   }
 
@@ -320,7 +354,11 @@ export default class PerformBattleUseCase {
 
     return {
       message: roundAttackPerformed,
-      metadata: { id: round?.getId, timestamp: round?.getTimestamp },
+      metadata: {
+        id: round?.getId,
+        timestamp: round?.getTimestamp,
+        type: round?.getType,
+      },
     };
   }
 
@@ -341,7 +379,11 @@ export default class PerformBattleUseCase {
     return {
       winnerPlayerName,
       message: roundFinishedBattle,
-      metadata: { id: round?.getId, timestamp: round?.getTimestamp },
+      metadata: {
+        id: round?.getId,
+        timestamp: round?.getTimestamp,
+        type: round?.getType,
+      },
     };
   }
 

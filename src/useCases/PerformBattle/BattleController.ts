@@ -36,4 +36,19 @@ export default class PerformBattleController {
       next(error);
     }
   }
+
+  async getBattleSummary(
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
+    try {
+      const battleId = request.params.id;
+      const battle = await this.performBattleUseCase.getBattleLog(battleId);
+
+      return response.status(HTTP_SUCCESS_CODE).send(battle);
+    } catch (error: any) {
+      next(error);
+    }
+  }
 }

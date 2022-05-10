@@ -36,7 +36,11 @@ export interface IRoundSummary {
 }
 
 export interface IRoundState {
-  calculatedAttack: number;
-  calculatedDamage: number;
-  executedDamage: IMethodCalculate;
+  calculatedAttack?: number;
+  calculatedDamage?: number;
+  executedDamage?: IMethodCalculate;
+  calculatedSpeed?: {
+    offensive?: IMethodCalculate;
+    defensive?: IMethodCalculate;
+  };
 }

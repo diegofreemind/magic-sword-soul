@@ -16,6 +16,10 @@ export default class Round extends BaseEntity {
   ) {
     super(id);
 
+    if (!type) {
+      this.type = RoundType.OnGoing;
+    }
+
     if (!timestamp) {
       this.timestamp = new Date().toISOString();
     }

@@ -4,6 +4,7 @@ import { BaseEntity } from '../../entities/BaseEntity';
 import { Pagination } from '../../shared/interfaces/IPagination';
 import { IUpdate } from '../../shared/interfaces/IPerformBattle';
 import { IRepository } from '../interfaces/IRepository';
+import { logger } from '../../config/logging';
 
 export abstract class Repository<T extends BaseEntity, Q, U extends IUpdate>
   implements IRepository<T, Q, U>
@@ -12,6 +13,7 @@ export abstract class Repository<T extends BaseEntity, Q, U extends IUpdate>
 
   save(entity: T): Promise<void> {
     this.InMemoryResource.push(entity);
+
     return Promise.resolve();
   }
 
@@ -48,7 +50,6 @@ export abstract class Repository<T extends BaseEntity, Q, U extends IUpdate>
       const limit = pageNumber * pageSize + pageSize;
 
       const slicedResult = queryResult.slice(skip, limit);
-
       return Promise.resolve(slicedResult);
     }
 

@@ -15,4 +15,10 @@ performBattleRouter.patch(
     battleController.initBattle(req, res, next)
 );
 
+performBattleRouter.get(
+  '/battle/summary/:id',
+  (req: Request, res: Response, next: NextFunction) =>
+    battleController.getBattleSummary(req, res, next)
+);
+
 export { performBattleRouter };
