@@ -1,4 +1,4 @@
-import { IsIn, IsString, IsUUID, IsOptional } from 'class-validator';
+import { IsIn, IsString, IsOptional } from 'class-validator';
 import { Professions, CharacterStatus } from '../../shared/enums/Character';
 
 export class ListCharacterDTO {

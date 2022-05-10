@@ -174,7 +174,7 @@ export default class PerformBattleUseCase {
     const { calculatedAttack, calculatedDamage, executedDamage } = roundState;
     const isFinalRound = executedDamage && executedDamage.calculated <= 0;
 
-    let updateRoundCollection: Round[] = [];
+    const updateRoundCollection: Round[] = [];
     round.setCalculatedAttack = calculatedAttack!;
     round.setCalculatedDamage = calculatedDamage!;
 
@@ -214,18 +214,20 @@ export default class PerformBattleUseCase {
 
   async endBattlePlayersState(players: Character[]) {
     for (const index in players) {
-      const player = players[index];
-      const currentLife = player?.getLife;
+      if (Object.prototype.hasOwnProperty.call(players, index)) {
+        const player = players[index];
+        const currentLife = player?.getLife;
 
-      const updateParams = {
-        life: currentLife > 0 ? currentLife : 0,
-        status: player.getStatus,
-      };
+        const updateParams = {
+          life: currentLife > 0 ? currentLife : 0,
+          status: player.getStatus,
+        };
 
-      await this.characterUseCase.updateCharacterById(
-        player.getId,
-        updateParams
-      );
+        await this.characterUseCase.updateCharacterById(
+          player.getId,
+          updateParams
+        );
+      }
     }
   }
 
@@ -304,6 +306,7 @@ export default class PerformBattleUseCase {
       });
     });
 
+    const finalMessage = finalRound.message ?? finalRound.winnerPlayerName;
     const messages = intermediateRounds.map((item) => item.message);
 
     return {
@@ -312,7 +315,7 @@ export default class PerformBattleUseCase {
       summary: {
         rounds: [firstRound, intermediateRounds, finalRound],
       },
-      text: [firstRound.message, ...messages, finalRound.message],
+      text: [firstRound.message, ...messages, finalMessage],
     };
   }
 

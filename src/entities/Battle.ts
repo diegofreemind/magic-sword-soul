@@ -82,11 +82,11 @@ export default class Battle extends BaseEntity implements IBattle {
     throw new Error(`The player ${defensive} was not found on this battle`);
   }
 
-  calculateAttack(id: string, lucky?: number): number {
+  calculateAttack(id: string): number {
     return this.calculateAttribute(ActionType.Attack, id);
   }
 
-  calculateSpeed(id: string, lucky?: number): number {
+  calculateSpeed(id: string): number {
     return this.calculateAttribute(ActionType.Speed, id);
   }
 

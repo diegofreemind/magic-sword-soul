@@ -1,3 +1,4 @@
+import helmet from 'helmet';
 import express, { Application } from 'express';
 import { errorMiddleware } from './shared/middlewares/errorMiddleware';
 import { initializeRepositories } from './repositories/implementations';
@@ -21,7 +22,7 @@ if (autoGenerateCharacters) {
 
 const app: Application = express();
 
-// TODO: include helmet
+app.use(helmet());
 app.use(express.json());
 
 app.use('/', performBattleRouter);

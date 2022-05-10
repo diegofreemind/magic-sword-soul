@@ -13,11 +13,22 @@
         "sourceType": "module"
     },
     "plugins": [
-        "@typescript-eslint"
+        "@typescript-eslint",
+        "prettier"
     ],
     "rules": {
-        "@typescript-eslint/no-unused-vars": "error",
-        "prettier/prettier": ["error", { "singleQuote": true }],
-        "@typescript-eslint/consistent-type-definitions": ["error"]
+        "new-cap": "off",
+        "require-jsdoc": "off",
+        "no-unused-vars": "off",
+        "@typescript-eslint/no-unused-vars": "off",
+        "prettier/prettier": [
+            "error",
+            {
+                "singleQuote": true
+            }
+        ],
+        "@typescript-eslint/consistent-type-definitions": [
+            "error"
+        ]
     }
 }

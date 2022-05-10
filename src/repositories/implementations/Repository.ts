@@ -4,7 +4,6 @@ import { BaseEntity } from '../../entities/BaseEntity';
 import { Pagination } from '../../shared/interfaces/IPagination';
 import { IUpdate } from '../../shared/interfaces/IPerformBattle';
 import { IRepository } from '../interfaces/IRepository';
-import { logger } from '../../config/logging';
 
 export abstract class Repository<T extends BaseEntity, Q, U extends IUpdate>
   implements IRepository<T, Q, U>
