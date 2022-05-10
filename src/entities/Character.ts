@@ -20,6 +20,7 @@ export abstract class Character extends BaseEntity {
 
   abstract attack(): number;
   abstract speed(): number;
+
   abstract labels(): { attack: string; speed: string };
 
   get getStatus() {
@@ -35,7 +36,7 @@ export abstract class Character extends BaseEntity {
   }
 
   set setLife(points: number) {
-    this.life = points;
+    this.life = points > 0 ? points : 0;
   }
 
   get getName() {

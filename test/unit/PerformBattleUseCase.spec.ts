@@ -274,7 +274,8 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
       expect(battleRepoSpy).toHaveBeenCalledTimes(1);
       expect(round.getCalculatedAttack).toBeDefined();
       expect(round.getCalculatedDamage).toBeDefined();
-      expect(round.getCalculatedSpeed).not.toBeDefined();
+      expect(round.getCalculatedSpeed.offensive).not.toBeDefined();
+      expect(round.getCalculatedSpeed.defensive).not.toBeDefined();
     });
 
     describe('Deve garantir a ordem das jogadas com base na velocidade_calculada inicial', () => {
@@ -474,7 +475,7 @@ describe('F4 - Realizar o combate entre dois personagens', () => {
 
       expect(executeDamageSpy).toBeCalledTimes(1);
 
-      expect(damagedPlayer!.getLife).toBeLessThan(0);
+      expect(damagedPlayer!.getLife).toBe(0);
       expect(damagedPlayer!.getStatus).toBe(CharacterStatus.Dead);
       expect(currentBattle.getStatus).toBe(BattleStatus.Finished);
     });

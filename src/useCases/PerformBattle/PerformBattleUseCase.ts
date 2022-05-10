@@ -21,8 +21,14 @@ import {
   IBattleState,
 } from '../../shared/interfaces/IPerformBattle';
 
-import { IRoundState } from '../../shared/interfaces/IPerformRound';
+import { IRoundLog, IRoundState } from '../../shared/interfaces/IPerformRound';
 import { CharacterStatus } from '../../shared/enums/Character';
+
+import {
+  RoundFastestPlayerSelected,
+  RoundAttackPerformed,
+  RoundFinishedBattle,
+} from '../../shared/templates/BattleLog';
 
 export default class PerformBattleUseCase {
   constructor(
@@ -78,6 +84,9 @@ export default class PerformBattleUseCase {
         RoundType.Initial
       );
 
+      initialRound.setCalculatedSpeed = fastestPlayer;
+      initialRound.setCalculatedSpeed = secondPlayer;
+
       const battleState = { battle, round: initialRound };
       this.checkBattleState(battleState, offensive, defensive);
 
@@ -128,9 +137,6 @@ export default class PerformBattleUseCase {
 
     const remainingLife = battle.executeDamage(calculatedAttack, defensive);
 
-    // TODO: review log infos
-    // console.log(RoundAttackPerformed);
-
     const executedDamage: IMethodCalculate = {
       id: defensive,
       calculated: remainingLife,
@@ -146,6 +152,55 @@ export default class PerformBattleUseCase {
     await this.setBattleState(battleState, roundState);
 
     return battleState;
+  }
+
+  async setBattleState(battleState: IBattleState, roundState: IRoundState) {
+    const { battle, round } = battleState;
+    const currentRound = { id: round.getId, type: round.getType! };
+    const { calculatedAttack, calculatedDamage, executedDamage } = roundState;
+
+    battle.setRounds = currentRound;
+    round.setCalculatedAttack = calculatedAttack;
+    round.setCalculatedDamage = calculatedDamage;
+
+    await this.roundRepository.save(round);
+
+    if (executedDamage.calculated <= 0) {
+      const battlePlayers = battle.getPlayers;
+      const winner = battlePlayers.find(
+        (player) => player.getStatus === CharacterStatus.Alive
+      );
+
+      if (winner) {
+        battle.setWinnerPlayer = winner.getId;
+        battle.setStatus = BattleStatus.Finished;
+      }
+
+      await this.endBattlePlayersState(battle.getPlayers);
+    }
+
+    await this.battleRepository.update(battle.getId, {
+      rounds: battle.getRounds,
+      status: battle.getStatus,
+      players: battle.getPlayers,
+    });
+  }
+
+  async endBattlePlayersState(players: Character[]) {
+    for (const index in players) {
+      const player = players[index];
+      const currentLife = player?.getLife;
+
+      const updateParams = {
+        life: currentLife > 0 ? currentLife : 0,
+        status: player.getStatus,
+      };
+
+      await this.characterUseCase.updateCharacterById(
+        player.getId,
+        updateParams
+      );
+    }
   }
 
   checkBattleState(state: IBattleState, offensive: string, defensive: string) {
@@ -187,62 +242,117 @@ export default class PerformBattleUseCase {
     }
   }
 
-  async setBattleState(battleState: IBattleState, roundState: IRoundState) {
-    const { battle, round } = battleState;
-    const currentRound = { id: round.getId, type: round.getType! };
-    const { calculatedAttack, calculatedDamage, executedDamage } = roundState;
+  async getBattleLog(battleId: string) {
+    const { rounds, battle } = await this.getBattleResources(battleId);
 
-    battle.setRounds = currentRound;
-    round.setCalculatedAttack = calculatedAttack;
-    round.setCalculatedDamage = calculatedDamage;
+    const initialRound = rounds.find((r) => r.getType === RoundType.Initial);
+    const closingRound = rounds.find((r) => r.getType === RoundType.Closing);
+    const onGoingRounds = rounds.filter((r) => r.getType === RoundType.OnGoing);
 
-    await this.roundRepository.save(round);
-
-    if (executedDamage.calculated <= 0) {
-      await this.endBattleState(battle);
-      await this.endBattlePlayersState(battle.getPlayers);
-
-      console.log({ endBattle: battle });
-    }
-
-    console.log({ battle });
-    await this.battleRepository.update(battle.getId, {
-      rounds: battle.getRounds,
-      status: battle.getStatus,
-      players: battle.getPlayers,
-    });
-  }
-
-  async endBattleState(battle: Battle) {
-    const battlePlayers = battle.getPlayers;
-    const winner = battlePlayers.find(
-      (p) => p.getStatus === CharacterStatus.Alive
+    const initialPlayersState = this.getDetailedPlayer(
+      battle?.getPlayers!,
+      initialRound!
     );
 
-    if (winner) {
-      battle.setWinnerPlayer = winner.getId;
-      battle.setStatus = BattleStatus.Finished;
-    }
+    const finalRound = this.generateClosingRoundLog(closingRound!, battle!);
+
+    const firstRound = this.generateInitialRoundLog(initialRound!, {
+      offensivePlayerName: initialPlayersState.players.offensive?.getName,
+      defensivePlayerName: initialPlayersState.players.defensive?.getName,
+    });
+
+    const intermediateRounds = onGoingRounds.map((round) => {
+      const { players } = this.getDetailedPlayer(battle?.getPlayers!, round);
+      const offensivePlayerName = players.offensive?.getName;
+      const defensivePlayerName = players.defensive?.getName;
+
+      return this.generateOnGoingRoundLog(round!, {
+        offensivePlayerName,
+        defensivePlayerName,
+      });
+    });
+
+    const messages = intermediateRounds.map((item) => item.message);
+
+    return {
+      battleId,
+      winner: finalRound.winnerPlayerName,
+      summary: {
+        firstRound,
+        intermediateRounds,
+        finalRound,
+      },
+      text: [firstRound.message, ...messages, finalRound.message],
+    };
   }
 
-  async endBattlePlayersState(players: Character[]) {
-    for (const index in players) {
-      const player = players[index];
-      const currentLife = player?.getLife;
+  generateInitialRoundLog(round: Round, params: IRoundLog) {
+    const { offensivePlayerName, defensivePlayerName } = params;
+    const calculatedSpeed = round?.getCalculatedSpeed;
 
-      const updateParams = {
-        life: currentLife > 0 ? currentLife : 0,
-        status: player.getStatus,
-      };
+    const defensiveCalculatedSpeed = calculatedSpeed?.defensive?.calculated;
+    const offensiveCalculatedSpeed = calculatedSpeed?.offensive?.calculated;
 
-      await this.characterUseCase.updateCharacterById(
-        player.getId,
-        updateParams
-      );
-    }
+    const roundFastestPlayerSelected = RoundFastestPlayerSelected({
+      offensivePlayerName,
+      defensivePlayerName,
+      defensiveCalculatedSpeed,
+      offensiveCalculatedSpeed,
+    });
+
+    return {
+      message: roundFastestPlayerSelected,
+      metadata: { id: round?.getId, timestamp: round?.getTimestamp },
+    };
   }
 
-  async getBattleLog(battleId: string) {
+  generateOnGoingRoundLog(round: Round, params: IRoundLog) {
+    const { offensivePlayerName, defensivePlayerName } = params;
+
+    const damage = round?.getCalculatedDamage;
+
+    const roundAttackPerformed = RoundAttackPerformed({
+      offensivePlayerName,
+      defensivePlayerName,
+      calculatedAttack: round.getCalculatedAttack,
+      calculatedDamage: damage! > 0 ? damage : 0,
+    });
+
+    return {
+      message: roundAttackPerformed,
+      metadata: { id: round?.getId, timestamp: round?.getTimestamp },
+    };
+  }
+
+  generateClosingRoundLog(round: Round, battle: Battle) {
+    const winnerPlayerId = battle?.getWinnerPlayer;
+    const winnerPlayer = battle?.getPlayers.find(
+      (player) => player.getId === winnerPlayerId
+    );
+
+    const winnerPlayerName = winnerPlayer?.getName;
+    const winnerRemainingLife = winnerPlayer?.getLife;
+
+    const roundFinishedBattle = RoundFinishedBattle({
+      winnerPlayerName,
+      calculatedDamage: winnerRemainingLife,
+    });
+
+    return {
+      winnerPlayerName,
+      message: roundFinishedBattle,
+      metadata: { id: round?.getId, timestamp: round?.getTimestamp },
+    };
+  }
+
+  getDetailedPlayer(players: Character[], round: Round) {
+    const offensive = players.find((i) => i.getId === round?.getOffensive);
+    const defensive = players.find((i) => i.getId === round?.getDefensive);
+
+    return { players: { offensive, defensive } };
+  }
+
+  async getBattleResources(battleId: string) {
     const rounds = await this.roundRepository.find({ battleId });
     const battle = await this.battleRepository.findById(battleId);
 

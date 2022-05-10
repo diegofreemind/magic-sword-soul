@@ -5,6 +5,13 @@ import {
   WARRIOR_INTELLIGENCE_DEFAULT,
 } from '../shared/constants/character';
 
+import {
+  WARRIOR_ATTACK_SKILL_PERCENTAGE,
+  WARRIOR_ATTACK_STRENGTH_PERCENTAGE,
+  WARRIOR_SPEED_INTELLIGENCE_PERCENTAGE,
+  WARRIOR_SPEED_SKILL_PERCENTAGE,
+} from '../shared/constants/character';
+
 import { CharacterStatus, Professions } from '../shared/enums/Character';
 import { WarriorLabels } from '../shared/templates/CharacterLabels';
 import { Character } from './Character';
@@ -29,17 +36,40 @@ export default class Warrior extends Character {
 
   labels() {
     return WarriorLabels({
-      skill: WARRIOR_SKILL_DEFAULT,
-      strength: WARRIOR_STRENGTH_DEFAULT,
-      intelligence: WARRIOR_INTELLIGENCE_DEFAULT,
+      attackProps: {
+        attackSkill: {
+          value: WARRIOR_SKILL_DEFAULT,
+          percentage: WARRIOR_ATTACK_SKILL_PERCENTAGE,
+        },
+        attackStrength: {
+          value: WARRIOR_STRENGTH_DEFAULT,
+          percentage: WARRIOR_ATTACK_STRENGTH_PERCENTAGE,
+        },
+      },
+      speedProps: {
+        speedSkill: {
+          value: WARRIOR_SKILL_DEFAULT,
+          percentage: WARRIOR_SPEED_SKILL_PERCENTAGE,
+        },
+        speedIntelligence: {
+          value: WARRIOR_INTELLIGENCE_DEFAULT,
+          percentage: WARRIOR_SPEED_INTELLIGENCE_PERCENTAGE,
+        },
+      },
     });
   }
 
   speed(): number {
-    return WARRIOR_SKILL_DEFAULT * 0.6 + WARRIOR_INTELLIGENCE_DEFAULT * 0.2;
+    return (
+      WARRIOR_SKILL_DEFAULT * WARRIOR_SPEED_SKILL_PERCENTAGE +
+      WARRIOR_INTELLIGENCE_DEFAULT * WARRIOR_SPEED_INTELLIGENCE_PERCENTAGE
+    );
   }
 
   attack(): number {
-    return WARRIOR_STRENGTH_DEFAULT * 0.8 + WARRIOR_SKILL_DEFAULT * 0.2;
+    return (
+      WARRIOR_STRENGTH_DEFAULT * WARRIOR_ATTACK_STRENGTH_PERCENTAGE +
+      WARRIOR_SKILL_DEFAULT * WARRIOR_ATTACK_SKILL_PERCENTAGE
+    );
   }
 }

@@ -1,3 +1,4 @@
+import { IMethodCalculate } from '../shared/interfaces/IPerformBattle';
 import { RoundType } from '../shared/enums/Battle';
 import { BaseEntity } from './BaseEntity';
 
@@ -9,7 +10,7 @@ export default class Round extends BaseEntity {
     private type?: RoundType,
     private timestamp?: string,
     id?: string,
-    private calculatedSpeed?: number,
+    private calculatedSpeed?: IMethodCalculate[],
     private calculatedAttack?: number,
     private calculatedDamage?: number
   ) {
@@ -17,6 +18,10 @@ export default class Round extends BaseEntity {
 
     if (!timestamp) {
       this.timestamp = new Date().toISOString();
+    }
+
+    if (!calculatedSpeed) {
+      this.calculatedSpeed = [];
     }
   }
 
@@ -26,6 +31,10 @@ export default class Round extends BaseEntity {
 
   get getOffensive() {
     return this.offensive;
+  }
+
+  get getTimestamp() {
+    return this.timestamp;
   }
 
   get getType() {
@@ -41,11 +50,14 @@ export default class Round extends BaseEntity {
   }
 
   get getCalculatedSpeed() {
-    return this.calculatedSpeed;
+    return {
+      offensive: this.calculatedSpeed?.find((i) => i.id === this.getOffensive),
+      defensive: this.calculatedSpeed?.find((i) => i.id === this.getDefensive),
+    };
   }
 
-  set setCalculatedSpeed(speed: number) {
-    this.calculatedSpeed = speed;
+  set setCalculatedSpeed(calculatedSpeed: IMethodCalculate) {
+    this.calculatedSpeed?.push(calculatedSpeed);
   }
 
   get getCalculatedAttack() {

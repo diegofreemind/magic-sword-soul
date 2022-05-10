@@ -5,6 +5,17 @@ import {
   MAGE_INTELLIGENCE_DEFAULT,
 } from '../shared/constants/character';
 
+import {
+  MAGE_ATTACK_SKILL_PERCENTAGE,
+  MAGE_ATTACK_STRENGTH_PERCENTAGE,
+  MAGE_ATTACK_INTELLIGENCE_PERCENTAGE,
+} from '../shared/constants/character';
+
+import {
+  MAGE_SPEED_STRENGTH_PERCENTAGE,
+  MAGE_SPEED_SKILL_PERCENTAGE,
+} from '../shared/constants/character';
+
 import { CharacterStatus, Professions } from '../shared/enums/Character';
 import { MageLabels } from '../shared/templates/CharacterLabels';
 import { Character } from './Character';
@@ -29,21 +40,45 @@ export default class Mage extends Character {
 
   labels() {
     return MageLabels({
-      skill: MAGE_SKILL_DEFAULT,
-      strength: MAGE_STRENGTH_DEFAULT,
-      intelligence: MAGE_INTELLIGENCE_DEFAULT,
+      attackProps: {
+        attackSkill: {
+          value: MAGE_SKILL_DEFAULT,
+          percentage: MAGE_ATTACK_SKILL_PERCENTAGE,
+        },
+        attackStrength: {
+          value: MAGE_STRENGTH_DEFAULT,
+          percentage: MAGE_ATTACK_STRENGTH_PERCENTAGE,
+        },
+        attackIntelligence: {
+          value: MAGE_INTELLIGENCE_DEFAULT,
+          percentage: MAGE_ATTACK_INTELLIGENCE_PERCENTAGE,
+        },
+      },
+      speedProps: {
+        speedSkill: {
+          value: MAGE_SKILL_DEFAULT,
+          percentage: MAGE_SPEED_SKILL_PERCENTAGE,
+        },
+        speedStrength: {
+          value: MAGE_STRENGTH_DEFAULT,
+          percentage: MAGE_SPEED_STRENGTH_PERCENTAGE,
+        },
+      },
     });
   }
 
   speed(): number {
-    return MAGE_STRENGTH_DEFAULT * 0.2 + MAGE_SKILL_DEFAULT * 0.5;
+    return (
+      MAGE_STRENGTH_DEFAULT * MAGE_SPEED_STRENGTH_PERCENTAGE +
+      MAGE_SKILL_DEFAULT * MAGE_SPEED_SKILL_PERCENTAGE
+    );
   }
 
   attack(): number {
     return (
-      MAGE_SKILL_DEFAULT * 0.5 +
-      MAGE_STRENGTH_DEFAULT * 0.2 +
-      MAGE_INTELLIGENCE_DEFAULT * 1.5
+      MAGE_SKILL_DEFAULT * MAGE_ATTACK_SKILL_PERCENTAGE +
+      MAGE_STRENGTH_DEFAULT * MAGE_ATTACK_STRENGTH_PERCENTAGE +
+      MAGE_INTELLIGENCE_DEFAULT * MAGE_ATTACK_INTELLIGENCE_PERCENTAGE
     );
   }
 }

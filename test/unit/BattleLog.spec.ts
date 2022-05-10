@@ -43,7 +43,7 @@ describe('F4 - Log de Batalha', () => {
       .spyOn(battleRepositoryFake, 'findById')
       .mockResolvedValue(Promise.resolve(currentBattle));
 
-    const { rounds } = await sut.getBattleLog(currentBattle.getId);
+    const { rounds } = await sut.getBattleResources(currentBattle.getId);
     const initialRound = rounds.filter((r) => r.getType === RoundType.Initial);
 
     expect(rounds).toBeDefined();
@@ -73,7 +73,9 @@ describe('F4 - Log de Batalha', () => {
       .spyOn(battleRepositoryFake, 'findById')
       .mockResolvedValue(Promise.resolve(stubBattle));
 
-    const { rounds, battle } = await sut.getBattleLog(currentBattle.getId);
+    const { rounds, battle } = await sut.getBattleResources(
+      currentBattle.getId
+    );
 
     const winner = battle?.getWinnerPlayer;
     const looser = battle?.getPlayers.find(
@@ -85,5 +87,34 @@ describe('F4 - Log de Batalha', () => {
     expect(rounds.length).toBeLessThanOrEqual(quantityRounds);
   });
 
-  test('Deve apresentar o conjunto de turnos da batalha', () => {});
+  test('Deve apresentar o conjunto de turnos da batalha', async () => {
+    const [playerOne, playerTwo] = getAliveCharacters();
+
+    const currentBattle = await battleStub(sut, battleRepositoryFake, [
+      playerOne,
+      playerTwo,
+    ]);
+
+    const quantityRounds = 10;
+
+    const { roundCollection, stubBattle } = await roundsStub(
+      quantityRounds,
+      currentBattle
+    );
+
+    jest
+      .spyOn(roundRepositoryFake, 'find')
+      .mockResolvedValue(Promise.resolve(roundCollection));
+
+    jest
+      .spyOn(battleRepositoryFake, 'findById')
+      .mockResolvedValue(Promise.resolve(stubBattle));
+
+    const battleLog = await sut.getBattleLog(currentBattle.getId);
+    expect(battleLog).toHaveProperty('battleId');
+    expect(battleLog).toHaveProperty('winner');
+    expect(battleLog).toHaveProperty('summary');
+    expect(battleLog).toHaveProperty('text');
+    expect(battleLog?.text).toBeInstanceOf(Array);
+  });
 });

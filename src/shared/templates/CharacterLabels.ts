@@ -1,28 +1,55 @@
-export const MageLabels = ({ strength, skill, intelligence }: any) => {
-  return {
-    attack: `20% da Força(${strength * 0.2}) + 50% da Destreza(${
-      skill * 0.5
-    }) + 150% da Inteligência(${intelligence * 1.5})`,
-    speed: `20% da Força(${strength * 0.2}) + 50% da Destreza(${skill * 0.5})`,
-  };
-};
+export const MageLabels = ({ attackProps, speedProps }: any) => {
+  const { speedStrength, speedSkill } = speedProps;
+  const { attackStrength, attackSkill, attackIntelligence } = attackProps;
 
-export const ThiefLabels = ({ strength, skill, intelligence }: any) => {
   return {
-    attack: `25% da Força(${
-      strength * 0.25
-    }) + 100% da Destreza(${skill}) + 25% da Inteligência(${
-      intelligence * 0.25
+    attack: `${attackStrength.percentage * 100}% da Força(${
+      attackStrength.value * attackStrength.percentage
+    }) + ${attackSkill.percentage * 100}% da Destreza(${
+      attackSkill.value * attackSkill.percentage
+    }) + ${attackIntelligence.percentage * 100}% da Inteligência(${
+      attackIntelligence.value * attackIntelligence.percentage
     })`,
-    speed: `80% da Destreza(${skill * 0.8})`,
+    speed: `${speedStrength.percentage * 100}% da Força(${
+      speedStrength.value * speedStrength.percentage
+    }) + ${speedSkill.percentage * 100}% da Destreza(${
+      speedSkill.value * speedSkill.percentage
+    })`,
   };
 };
 
-export const WarriorLabels = ({ strength, skill, intelligence }: any) => {
+export const ThiefLabels = ({ attackProps, speedProps }: any) => {
+  const { speedSkill } = speedProps;
+  const { attackStrength, attackSkill, attackIntelligence } = attackProps;
+
   return {
-    attack: `80% da Força(${strength * 0.8}) + 20% da Destreza(${skill * 0.2})`,
-    speed: `60% da Destreza(${skill * 0.6}) + 20% da Inteligência(${
-      intelligence * 0.2
+    attack: `${attackStrength.percentage * 100}% da Força(${
+      attackStrength.value * attackStrength.percentage
+    }) + ${attackSkill.percentage * 100}% da Destreza(${
+      attackSkill.value * attackSkill.percentage
+    }) + ${attackIntelligence.percentage * 100}% da Inteligência(${
+      attackIntelligence.value * attackIntelligence.percentage
+    })`,
+    speed: `${speedSkill.percentage * 100}% da Destreza(${
+      speedSkill.value * speedSkill.percentage
+    })`,
+  };
+};
+
+export const WarriorLabels = ({ attackProps, speedProps }: any) => {
+  const { speedSkill, speedIntelligence } = speedProps;
+  const { attackStrength, attackSkill } = attackProps;
+
+  return {
+    attack: `${attackStrength.percentage * 100}% da Força(${
+      attackStrength.value * attackStrength.percentage
+    }) + ${attackSkill.percentage * 100}% da Destreza(${
+      attackSkill.value * attackSkill.percentage
+    })`,
+    speed: `${speedSkill.percentage * 100}% da Destreza(${
+      speedSkill.value * speedSkill.percentage
+    }) + ${speedIntelligence.percentage * 100}% da Inteligência(${
+      speedIntelligence.value * speedIntelligence.percentage
     })`,
   };
 };

@@ -2,13 +2,13 @@ import { RoundType } from '../enums/Battle';
 import { IMethodCalculate } from './IPerformBattle';
 
 export interface IRoundLog {
-  offensive?: string;
-  defensive: string;
-  winner?: string;
+  offensivePlayerName?: string;
+  defensivePlayerName?: string;
+  winnerPlayerName?: string;
   calculatedAttack?: number;
   calculatedDamage?: number;
-  defensiveCalculatedSpeed?: number;
   offensiveCalculatedSpeed?: number;
+  defensiveCalculatedSpeed?: number;
 }
 
 export interface IRoundQuery {

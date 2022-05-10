@@ -65,8 +65,6 @@ describe('RoundRepository:', () => {
       battleId: battleOne.getId,
     });
 
-    console.log({ rounds });
-
     expect(rounds).toBeDefined();
     expect(rounds).toHaveLength(2);
 

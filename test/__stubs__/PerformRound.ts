@@ -36,7 +36,8 @@ export const roundsStub = async (quantityRounds: number, battle: Battle) => {
     );
 
     if (round.getType === RoundType.Initial) {
-      round.setCalculatedSpeed = round.getType === RoundType.Initial ? 10 : 0;
+      round.setCalculatedSpeed = { id: currentOffensive, calculated: 10 };
+      round.setCalculatedSpeed = { id: currentDefensive, calculated: 8 };
     } else if (battle.getStatus === BattleStatus.Active) {
       const calculatedAttack = battle.calculateAttack(currentOffensive);
       const calculatedDamage = battle.calculateDamage(
@@ -46,6 +47,8 @@ export const roundsStub = async (quantityRounds: number, battle: Battle) => {
 
       battle.executeDamage(calculatedAttack, currentDefensive);
       battle.setRounds = { id: round.getId, type: roundType };
+      round.setCalculatedAttack = calculatedAttack;
+      round.setCalculatedDamage = calculatedDamage;
 
       if (calculatedDamage <= 0) {
         const battlePlayers = battle.getPlayers;
@@ -57,10 +60,9 @@ export const roundsStub = async (quantityRounds: number, battle: Battle) => {
           battle.setWinnerPlayer = winner.getId;
           battle.setStatus = BattleStatus.Finished;
         }
-
-        round.setCalculatedAttack = calculatedAttack;
-        round.setCalculatedDamage = calculatedDamage;
       }
+    } else {
+      break;
     }
 
     roundCollection.push(round);
